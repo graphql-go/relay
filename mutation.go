@@ -4,7 +4,7 @@ import (
 	"github.com/chris-ramon/graphql-go/types"
 )
 
-type MutationFn func(object map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{}
+type MutationFn func(inputMap map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{}
 
 /*
 A description of a mutation consumable by mutationWithClientMutationId

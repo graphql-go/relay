@@ -96,7 +96,6 @@ func FromGlobalId(globalId string) *ResolvedGlobalId {
 	if err == nil {
 		strId = string(b)
 	}
-
 	tokens := strings.Split(strId, ":")
 	if len(tokens) < 2 {
 		return nil

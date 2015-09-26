@@ -25,7 +25,7 @@ var simpleMutationTest = graphql_relay.MutationWithClientMutationId(graphql_rela
 			Type: types.GraphQLInt,
 		},
 	},
-	MutateAndGetPayload: func(object map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
 		return map[string]interface{}{
 			"result": 1,
 		}
@@ -41,7 +41,7 @@ var simplePromiseMutationTest = graphql_relay.MutationWithClientMutationId(graph
 			Type: types.GraphQLInt,
 		},
 	},
-	MutateAndGetPayload: func(object map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
 		c := make(chan int)
 		go testAsyncDataMutation(&c)
 		result := <-c
