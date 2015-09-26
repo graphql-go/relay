@@ -8,7 +8,7 @@ Note: Currently based on an experimental branch of [`graphql-go`](https://github
 
 
 ### TODO:
-- [ ] Starwars example
+- [x] Starwars example
 - [ ] In-code documentation (godocs)
 - [ ] Usage guide / user documentation
 - [ ] End-to-end example (graphql-relay-go + react-relay)
