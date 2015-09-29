@@ -328,8 +328,13 @@ func init() {
 	 * Finally, we construct our schema (whose starting query type is the query
 	 * type we defined above) and export it.
 	 */
-	Schema, _ = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+	var err error
+	Schema, err = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
 		Query:    queryType,
 		Mutation: mutationType,
 	})
+	if err != nil {
+		// panic if there is an error in schema
+		panic(err)
+	}
 }
