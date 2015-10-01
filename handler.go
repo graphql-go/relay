@@ -8,6 +8,7 @@ import (
 	"github.com/unrolled/render"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -23,6 +24,13 @@ type Handler struct {
 	render *render.Render
 }
 type requestOptions struct {
+	Query         string                 `json:"query" url:"query" schema:"query"`
+	Variables     map[string]interface{} `json:"variables" url:"variables" schema:"variables"`
+	OperationName string                 `json:"operationName" url:"operationName" schema:"operationName"`
+}
+
+// a workaround for getting`variables` as a JSON string
+type requestOptionsCompatibility struct {
 	Query         string `json:"query" url:"query" schema:"query"`
 	Variables     string `json:"variables" url:"variables" schema:"variables"`
 	OperationName string `json:"operationName" url:"operationName" schema:"operationName"`
@@ -32,9 +40,15 @@ func getRequestOptions(r *http.Request) *requestOptions {
 
 	query := r.URL.Query().Get("query")
 	if query != "" {
+
+		// get variables map
+		var variables map[string]interface{}
+		variablesStr := r.URL.Query().Get("variables")
+		json.Unmarshal([]byte(variablesStr), variables)
+
 		return &requestOptions{
 			Query:         query,
-			Variables:     r.URL.Query().Get("variables"),
+			Variables:     variables,
 			OperationName: r.URL.Query().Get("operationName"),
 		}
 	}
@@ -45,10 +59,14 @@ func getRequestOptions(r *http.Request) *requestOptions {
 		return &requestOptions{}
 	}
 
-	switch r.Header.Get("Content-Type") {
+	// TODO: improve Content-Type handling
+	contentTypeStr := r.Header.Get("Content-Type")
+	contentTypeTokens := strings.Split(contentTypeStr, ";")
+	contentType := contentTypeTokens[0]
+
+	switch contentType {
 	case ContentTypeGraphQL:
 		body, err := ioutil.ReadAll(r.Body)
-		r.Body.Close()
 		if err != nil {
 			return &requestOptions{}
 		}
@@ -69,11 +87,18 @@ func getRequestOptions(r *http.Request) *requestOptions {
 	case ContentTypeJSON:
 		fallthrough
 	default:
-		jsonDecoder := json.NewDecoder(r.Body)
 		var opts requestOptions
-		err := jsonDecoder.Decode(&opts)
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			return &requestOptions{}
+			return &opts
+		}
+		err = json.Unmarshal(body, &opts)
+		if err != nil {
+			// Probably `variables` was sent as a string instead of an object.
+			// So, we try to be polite and try to parse that as a JSON string
+			var optsCompatible requestOptionsCompatibility
+			json.Unmarshal(body, &optsCompatible)
+			json.Unmarshal([]byte(optsCompatible.Variables), &opts.Variables)
 		}
 		return &opts
 	}
@@ -88,8 +113,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// execute graphql query
 	resultChannel := make(chan *types.GraphQLResult)
 	params := gql.GraphqlParams{
-		Schema:        *h.Schema,
-		RequestString: opts.Query,
+		Schema:         *h.Schema,
+		RequestString:  opts.Query,
+		VariableValues: opts.Variables,
+		OperationName:  opts.OperationName,
 	}
 	go gql.Graphql(params, resultChannel)
 	result := <-resultChannel

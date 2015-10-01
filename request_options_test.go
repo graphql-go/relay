@@ -149,6 +149,50 @@ func TestRequestOptions_POST_ContentTypeApplicationJSON(t *testing.T) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
+func TestRequestOptions_POST_ContentTypeApplicationJSON_WithVariablesAsObject(t *testing.T) {
+	body := `
+	{
+		"query": "query RebelsShipsQuery { rebels { name } }",
+		"variables": { "a": 1, "b": "2" }
+	}`
+	expected := &requestOptions{
+		Query: "query RebelsShipsQuery { rebels { name } }",
+		Variables: map[string]interface{}{
+			"a": float64(1),
+			"b": "2",
+		},
+	}
+
+	req, _ := http.NewRequest("POST", "/graphql", bytes.NewBufferString(body))
+	req.Header.Add("Content-Type", "application/json")
+	result := getRequestOptions(req)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
+	}
+}
+func TestRequestOptions_POST_ContentTypeApplicationJSON_WithVariablesAsString(t *testing.T) {
+	body := `
+	{
+		"query": "query RebelsShipsQuery { rebels { name } }",
+		"variables": "{ \"a\": 1, \"b\": \"2\" }"
+	}`
+	expected := &requestOptions{
+		Query: "query RebelsShipsQuery { rebels { name } }",
+		Variables: map[string]interface{}{
+			"a": float64(1),
+			"b": "2",
+		},
+	}
+
+	req, _ := http.NewRequest("POST", "/graphql", bytes.NewBufferString(body))
+	req.Header.Add("Content-Type", "application/json")
+	result := getRequestOptions(req)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
+	}
+}
 func TestRequestOptions_POST_ContentTypeApplicationJSON_WithInvalidJSON(t *testing.T) {
 	body := `INVALIDJSON{}`
 	expected := &requestOptions{}

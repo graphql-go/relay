@@ -50,7 +50,7 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 		Args: types.GraphQLFieldConfigArgumentMap{
 			"id": &types.GraphQLArgumentConfig{
 				Type:        types.NewGraphQLNonNull(types.GraphQLID),
-				Description: "The 111111 ID of an object",
+				Description: "The ID of an object",
 			},
 		},
 		Resolve: func(p types.GQLFRParams) interface{} {
