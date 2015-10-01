@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/kr/pretty"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -124,8 +123,7 @@ func TestRequestOptions_POST_ContentTypeApplicationGraphQL_EmptyBody(t *testing.
 func TestRequestOptions_POST_ContentTypeApplicationGraphQL_NilBody(t *testing.T) {
 	expected := &requestOptions{}
 
-	req, err := http.NewRequest("POST", "/graphql", nil)
-	pretty.Println(err)
+	req, _ := http.NewRequest("POST", "/graphql", nil)
 	req.Header.Add("Content-Type", "application/graphql")
 	result := getRequestOptions(req)
 
