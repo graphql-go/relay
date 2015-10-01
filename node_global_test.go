@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"fmt"
@@ -29,9 +29,9 @@ var globalIDTestPhotoData = map[string]*photo2{
 var globalIDTestUserType *types.GraphQLObjectType
 var globalIDTestPhotoType *types.GraphQLObjectType
 
-var globalIDTestDef = graphql_relay.NewNodeDefinitions(graphql_relay.NodeDefinitionsConfig{
+var globalIDTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 	IdFetcher: func(globalId string, info types.GraphQLResolveInfo) interface{} {
-		resolvedGlobalId := graphql_relay.FromGlobalId(globalId)
+		resolvedGlobalId := gqlrelay.FromGlobalId(globalId)
 		if resolvedGlobalId == nil {
 			return nil
 		}
@@ -77,7 +77,7 @@ func init() {
 	globalIDTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
 		Name: "User",
 		Fields: types.GraphQLFieldConfigMap{
-			"id": graphql_relay.GlobalIdField("User", nil),
+			"id": gqlrelay.GlobalIdField("User", nil),
 			"name": &types.GraphQLFieldConfig{
 				Type: types.GraphQLString,
 			},
@@ -94,7 +94,7 @@ func init() {
 	globalIDTestPhotoType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
 		Name: "Photo",
 		Fields: types.GraphQLFieldConfigMap{
-			"id": graphql_relay.GlobalIdField("Photo", photoIdFetcher),
+			"id": gqlrelay.GlobalIdField("Photo", photoIdFetcher),
 			"width": &types.GraphQLFieldConfig{
 				Type: types.GraphQLInt,
 			},

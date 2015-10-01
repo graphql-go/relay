@@ -86,7 +86,7 @@ import (
 // - shipType refers to
 // - nodeDefinitions
 
-var nodeDefinitions *graphql_relay.NodeDefinitions
+var nodeDefinitions *gqlrelay.NodeDefinitions
 var shipType *types.GraphQLObjectType
 var factionType *types.GraphQLObjectType
 
@@ -101,10 +101,10 @@ func init() {
 	 * The first method is the way we resolve an ID to its object. The second is the
 	 * way we resolve an object that implements node to its type.
 	 */
-	nodeDefinitions = graphql_relay.NewNodeDefinitions(graphql_relay.NodeDefinitionsConfig{
+	nodeDefinitions = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 		IdFetcher: func(id string, info types.GraphQLResolveInfo) interface{} {
 			// resolve id from global id
-			resolvedId := graphql_relay.FromGlobalId(id)
+			resolvedId := gqlrelay.FromGlobalId(id)
 
 			// based on id and its type, return the object
 			if resolvedId.Type == "Faction" {
@@ -137,7 +137,7 @@ func init() {
 		Name:        "Ship",
 		Description: "A ship in the Star Wars saga",
 		Fields: types.GraphQLFieldConfigMap{
-			"id": graphql_relay.GlobalIdField("Ship", nil),
+			"id": gqlrelay.GlobalIdField("Ship", nil),
 			"name": &types.GraphQLFieldConfig{
 				Type:        types.GraphQLString,
 				Description: "The name of the ship.",
@@ -164,7 +164,7 @@ func init() {
 	 *     node: Ship
 	 *   }
 	 */
-	shipConnectionDefinition := graphql_relay.ConnectionDefinitions(graphql_relay.ConnectionConfig{
+	shipConnectionDefinition := gqlrelay.ConnectionDefinitions(gqlrelay.ConnectionConfig{
 		Name:     "Ship",
 		NodeType: shipType,
 	})
@@ -183,17 +183,17 @@ func init() {
 		Name:        "Faction",
 		Description: "A faction in the Star Wars saga",
 		Fields: types.GraphQLFieldConfigMap{
-			"id": graphql_relay.GlobalIdField("Faction", nil),
+			"id": gqlrelay.GlobalIdField("Faction", nil),
 			"name": &types.GraphQLFieldConfig{
 				Type:        types.GraphQLString,
 				Description: "The name of the faction.",
 			},
 			"ships": &types.GraphQLFieldConfig{
 				Type: shipConnectionDefinition.ConnectionType,
-				Args: graphql_relay.ConnectionArgs,
+				Args: gqlrelay.ConnectionArgs,
 				Resolve: func(p types.GQLFRParams) interface{} {
 					// convert args map[string]interface into ConnectionArguments
-					args := graphql_relay.NewConnectionArguments(p.Args)
+					args := gqlrelay.NewConnectionArguments(p.Args)
 
 					// get ship objects from current faction
 					ships := []interface{}{}
@@ -205,7 +205,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return graphql_relay.ConnectionFromArray(ships, args)
+					return gqlrelay.ConnectionFromArray(ships, args)
 				},
 			},
 		},
@@ -261,7 +261,7 @@ func init() {
 	 *     faction: Faction
 	 *   }
 	 */
-	shipMutation := graphql_relay.MutationWithClientMutationId(graphql_relay.MutationConfig{
+	shipMutation := gqlrelay.MutationWithClientMutationId(gqlrelay.MutationConfig{
 		Name: "IntroduceShip",
 		InputFields: types.InputObjectConfigFieldMap{
 			"shipName": &types.InputObjectFieldConfig{

@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ var nodeTestPhotoData = map[string]*photo{
 var nodeTestUserType *types.GraphQLObjectType
 var nodeTestPhotoType *types.GraphQLObjectType
 
-var nodeTestDef = graphql_relay.NewNodeDefinitions(graphql_relay.NodeDefinitionsConfig{
+var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 	IdFetcher: func(id string, info types.GraphQLResolveInfo) interface{} {
 		if user, ok := nodeTestUserData[id]; ok {
 			return user

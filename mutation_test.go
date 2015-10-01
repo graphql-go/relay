@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"github.com/chris-ramon/graphql-go"
@@ -17,7 +17,7 @@ func testAsyncDataMutation(resultChan *chan int) {
 	*resultChan <- int(1)
 }
 
-var simpleMutationTest = graphql_relay.MutationWithClientMutationId(graphql_relay.MutationConfig{
+var simpleMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.MutationConfig{
 	Name:        "SimpleMutation",
 	InputFields: types.InputObjectConfigFieldMap{},
 	OutputFields: types.GraphQLFieldConfigMap{
@@ -33,7 +33,7 @@ var simpleMutationTest = graphql_relay.MutationWithClientMutationId(graphql_rela
 })
 
 // async mutation
-var simplePromiseMutationTest = graphql_relay.MutationWithClientMutationId(graphql_relay.MutationConfig{
+var simplePromiseMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.MutationConfig{
 	Name:        "SimplePromiseMutation",
 	InputFields: types.InputObjectConfigFieldMap{},
 	OutputFields: types.GraphQLFieldConfigMap{
@@ -188,7 +188,6 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
 	}
 }
 func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
-	t.Skipf("Need a util to test for slice equality as an unordered set")
 	query := `{
         __type(name: "SimpleMutationPayload") {
           name
@@ -239,13 +238,11 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
+	if !testutil.ContainSubset(result.Data.(map[string]interface{}), expected.Data.(map[string]interface{})) {
+		t.Fatalf("unexpected, result does not contain subset of expected data")
 	}
 }
 func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
-	t.Skipf("Need a util to test for slice equality as an unordered set")
-
 	query := `{
         __schema {
           mutationType {
@@ -311,8 +308,8 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 								},
 							},
 							"type": map[string]interface{}{
-								"name": "SimpleMutationPayload",
-								"kind": "SimplePromiseMutationPayload",
+								"name": "SimplePromiseMutationPayload",
+								"kind": "OBJECT",
 							},
 						},
 					},
@@ -324,7 +321,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
-	if !reflect.DeepEqual(result, expected) {
-		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
+	if !testutil.ContainSubset(result.Data.(map[string]interface{}), expected.Data.(map[string]interface{})) {
+		t.Fatalf("unexpected, result does not contain subset of expected data")
 	}
 }

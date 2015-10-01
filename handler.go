@@ -1,4 +1,4 @@
-package graphql_relay
+package gqlrelay
 
 import (
 	"encoding/json"

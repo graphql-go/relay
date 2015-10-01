@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ var pluralTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfi
 var pluralTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
 	Name: "Query",
 	Fields: types.GraphQLFieldConfigMap{
-		"usernames": graphql_relay.PluralIdentifyingRootField(graphql_relay.PluralIdentifyingRootFieldConfig{
+		"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
 			ArgName:     "usernames",
 			Description: "Map from a username to the user",
 			InputType:   types.GraphQLString,
@@ -162,7 +162,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 	var pluralTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
 		Name: "Query",
 		Fields: types.GraphQLFieldConfigMap{
-			"usernames": graphql_relay.PluralIdentifyingRootField(graphql_relay.PluralIdentifyingRootFieldConfig{
+			"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
 				ArgName:     "usernames",
 				Description: "Map from a username to the user",
 				InputType:   types.GraphQLString,

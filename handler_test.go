@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"encoding/json"
@@ -31,7 +31,7 @@ func decodeResponse(t *testing.T, recorder *httptest.ResponseRecorder) *types.Gr
 	}
 	return &target
 }
-func executeTest(t *testing.T, h *graphql_relay.Handler, req *http.Request) (*types.GraphQLResult, *httptest.ResponseRecorder) {
+func executeTest(t *testing.T, h *gqlrelay.Handler, req *http.Request) (*types.GraphQLResult, *httptest.ResponseRecorder) {
 	resp := httptest.NewRecorder()
 	h.ServeHTTP(resp, req)
 	result := decodeResponse(t, resp)
@@ -51,7 +51,7 @@ func TestHandler_BasicQuery(t *testing.T) {
 	queryString := `query=query RebelsShipsQuery { rebels { id, name } }`
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/graphql?%v", queryString), nil)
 
-	h := graphql_relay.NewHandler(&graphql_relay.HandlerConfig{
+	h := gqlrelay.NewHandler(&gqlrelay.HandlerConfig{
 		Schema: &starwars.Schema,
 		Pretty: true,
 	})
@@ -78,6 +78,6 @@ func TestHandler_Params_NilParams(t *testing.T) {
 		}
 		t.Fatalf("expected to panic, did not panic")
 	}()
-	_ = graphql_relay.NewHandler(nil)
+	_ = gqlrelay.NewHandler(nil)
 
 }

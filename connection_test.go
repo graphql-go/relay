@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"github.com/chris-ramon/graphql-go"
@@ -19,7 +19,7 @@ var connectionTestAllUsers = []interface{}{
 var connectionTestUserType *types.GraphQLObjectType
 var connectionTestQueryType *types.GraphQLObjectType
 var connectionTestSchema types.GraphQLSchema
-var connectionTestConnectionDef *graphql_relay.GraphQLConnectionDefinitions
+var connectionTestConnectionDef *gqlrelay.GraphQLConnectionDefinitions
 
 func init() {
 	connectionTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
@@ -33,7 +33,7 @@ func init() {
 		},
 	})
 
-	connectionTestConnectionDef = graphql_relay.ConnectionDefinitions(graphql_relay.ConnectionConfig{
+	connectionTestConnectionDef = gqlrelay.ConnectionDefinitions(gqlrelay.ConnectionConfig{
 		Name:     "Friend",
 		NodeType: connectionTestUserType,
 		EdgeFields: types.GraphQLFieldConfigMap{
@@ -57,10 +57,10 @@ func init() {
 	// define `friends` field here after getting connection definition
 	connectionTestUserType.AddFieldConfig("friends", &types.GraphQLFieldConfig{
 		Type: connectionTestConnectionDef.ConnectionType,
-		Args: graphql_relay.ConnectionArgs,
+		Args: gqlrelay.ConnectionArgs,
 		Resolve: func(p types.GQLFRParams) interface{} {
-			arg := graphql_relay.NewConnectionArguments(p.Args)
-			res := graphql_relay.ConnectionFromArray(connectionTestAllUsers, arg)
+			arg := gqlrelay.NewConnectionArguments(p.Args)
+			res := gqlrelay.ConnectionFromArray(connectionTestAllUsers, arg)
 			return res
 		},
 	})

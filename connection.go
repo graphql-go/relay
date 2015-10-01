@@ -1,4 +1,4 @@
-package graphql_relay
+package gqlrelay
 
 import "github.com/chris-ramon/graphql-go/types"
 

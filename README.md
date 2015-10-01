@@ -24,7 +24,7 @@ func main() {
   schema := types.NewGraphQLSchema(...)
   
 	// simplest relay-compliant schema server
-	h := graphql_relay.NewHandler(&graphql_relay.HandlerConfig{
+	h := gqlrelay.NewHandler(&gqlrelay.HandlerConfig{
   		Schema: &starwars.Schema,
   		Pretty: true,
   })

@@ -1,4 +1,4 @@
-package graphql_relay_test
+package gqlrelay_test
 
 import (
 	"github.com/chris-ramon/graphql-go/testutil"
@@ -12,32 +12,32 @@ var arrayConnectionTestLetters = []interface{}{
 }
 
 func TestConnectionFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilters(t *testing.T) {
-	args := graphql_relay.NewConnectionArguments(nil)
+	args := gqlrelay.NewConnectionArguments(nil)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -45,7 +45,7 @@ func TestConnectionFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilter
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -56,24 +56,24 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testin
 	filter := map[string]interface{}{
 		"first": 2,
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
 	// Alternatively, you can create connection arg the following way.
-	// args := graphql_relay.NewConnectionArguments(filter)
+	// args := gqlrelay.NewConnectionArguments(filter)
 	// args.First = 2
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjE=",
 			HasPreviousPage: false,
@@ -81,7 +81,7 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsASmallerFirst(t *testin
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -91,32 +91,32 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *t
 	filter := map[string]interface{}{
 		"first": 10,
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -124,7 +124,7 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeFirst(t *t
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -134,20 +134,20 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing
 	filter := map[string]interface{}{
 		"last": 2,
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: true,
@@ -155,7 +155,7 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsASmallerLast(t *testing
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -165,32 +165,32 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *te
 	filter := map[string]interface{}{
 		"last": 10,
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -198,7 +198,7 @@ func TestConnectionFromArray_HandlesBasicSlicing_RespectsAnOverlyLargeLast(t *te
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -210,20 +210,20 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.
 		"first": 2,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -231,7 +231,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfter(t *testing.
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -242,24 +242,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirs
 		"first": 10,
 		"after": "YXJyYXljb25uZWN0aW9uOjE=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -267,7 +267,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterWithLongFirs
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -277,20 +277,20 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.
 		"last":   2,
 		"before": "YXJyYXljb25uZWN0aW9uOjM=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: true,
@@ -298,7 +298,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndBefore(t *testing.
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -308,24 +308,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast
 		"last":   10,
 		"before": "YXJyYXljb25uZWN0aW9uOjM=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -333,7 +333,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndBeforeWithLongLast
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -344,20 +344,20 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_To
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
 			HasPreviousPage: false,
@@ -365,7 +365,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_To
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -376,24 +376,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_To
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -401,7 +401,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_To
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -412,24 +412,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_Ex
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -437,7 +437,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsFirstAndAfterAndBefore_Ex
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -448,20 +448,20 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_Too
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: true,
@@ -469,7 +469,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_Too
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -480,24 +480,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_To
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -505,7 +505,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsLasttAndAfterAndBefore_To
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -516,24 +516,24 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_Exa
 		"after":  "YXJyYXljb25uZWN0aW9uOjA=",
 		"before": "YXJyYXljb25uZWN0aW9uOjQ=",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
 			HasPreviousPage: false,
@@ -541,7 +541,7 @@ func TestConnectionFromArray_HandlesPagination_RespectsLastAndAfterAndBefore_Exa
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -551,14 +551,14 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZe
 	filter := map[string]interface{}{
 		"first": 0,
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges:    []*graphql_relay.Edge{},
-		PageInfo: graphql_relay.PageInfo{},
+	expected := &gqlrelay.Connection{
+		Edges:    []*gqlrelay.Edge{},
+		PageInfo: gqlrelay.PageInfo{},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -568,32 +568,32 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsA
 		"before": "invalid",
 		"after":  "invalid",
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -601,7 +601,7 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsA
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -611,32 +611,32 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsA
 		"before": "YXJyYXljb25uZWN0aW9uOjYK",     // ==> offset: int(6)
 		"after":  "YXJyYXljb25uZWN0aW9uOi0xCg==", // ==> offset: int(-1)
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges: []*graphql_relay.Edge{
-			&graphql_relay.Edge{
+	expected := &gqlrelay.Connection{
+		Edges: []*gqlrelay.Edge{
+			&gqlrelay.Edge{
 				Node:   "A",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjA=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "B",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "C",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "D",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
 			},
-			&graphql_relay.Edge{
+			&gqlrelay.Edge{
 				Node:   "E",
 				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
 			},
 		},
-		PageInfo: graphql_relay.PageInfo{
+		PageInfo: gqlrelay.PageInfo{
 			StartCursor:     "YXJyYXljb25uZWN0aW9uOjA=",
 			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
 			HasPreviousPage: false,
@@ -644,7 +644,7 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsAllElementsIfCursorsA
 		},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -655,14 +655,14 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsNullIfCursorsIsConsec
 		"before": "YXJyYXljb25uZWN0aW9uOjM=", // ==> offset: int(3)
 		"after":  "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges:    []*graphql_relay.Edge{},
-		PageInfo: graphql_relay.PageInfo{},
+	expected := &gqlrelay.Connection{
+		Edges:    []*gqlrelay.Edge{},
+		PageInfo: gqlrelay.PageInfo{},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
@@ -672,27 +672,27 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfCursorsCr
 		"before": "YXJyYXljb25uZWN0aW9uOjI=", // ==> offset: int(2)
 		"after":  "YXJyYXljb25uZWN0aW9uOjQ=", // ==> offset: int(4)
 	}
-	args := graphql_relay.NewConnectionArguments(filter)
+	args := gqlrelay.NewConnectionArguments(filter)
 
-	expected := &graphql_relay.Connection{
-		Edges:    []*graphql_relay.Edge{},
-		PageInfo: graphql_relay.PageInfo{},
+	expected := &gqlrelay.Connection{
+		Edges:    []*gqlrelay.Edge{},
+		PageInfo: gqlrelay.PageInfo{},
 	}
 
-	result := graphql_relay.ConnectionFromArray(arrayConnectionTestLetters, args)
+	result := gqlrelay.ConnectionFromArray(arrayConnectionTestLetters, args)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
 }
 func TestConnectionFromArray_CursorForObjectInConnection_ReturnsAnEdgeCursor_GivenAnArrayAndAMemberObject(t *testing.T) {
-	letterBCursor := graphql_relay.CursorForObjectInConnection(arrayConnectionTestLetters, "B")
-	expected := graphql_relay.ConnectionCursor("YXJyYXljb25uZWN0aW9uOjE=")
+	letterBCursor := gqlrelay.CursorForObjectInConnection(arrayConnectionTestLetters, "B")
+	expected := gqlrelay.ConnectionCursor("YXJyYXljb25uZWN0aW9uOjE=")
 	if !reflect.DeepEqual(letterBCursor, expected) {
 		t.Fatalf("wrong result, cursor result diff: %v", testutil.Diff(expected, letterBCursor))
 	}
 }
 func TestConnectionFromArray_CursorForObjectInConnection_ReturnsEmptyCursor_GivenAnArrayAndANonMemberObject(t *testing.T) {
-	letterFCursor := graphql_relay.CursorForObjectInConnection(arrayConnectionTestLetters, "F")
+	letterFCursor := gqlrelay.CursorForObjectInConnection(arrayConnectionTestLetters, "F")
 	if letterFCursor != "" {
 		t.Fatalf("wrong result, expected empty cursor, got: %v", letterFCursor)
 	}
