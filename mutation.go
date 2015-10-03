@@ -35,10 +35,16 @@ provided MutationConfig.
 func MutationWithClientMutationId(config MutationConfig) *types.GraphQLFieldConfig {
 
 	augmentedInputFields := config.InputFields
+	if augmentedInputFields == nil {
+		augmentedInputFields = types.InputObjectConfigFieldMap{}
+	}
 	augmentedInputFields["clientMutationId"] = &types.InputObjectFieldConfig{
 		Type: types.NewGraphQLNonNull(types.GraphQLString),
 	}
 	augmentedOutputFields := config.OutputFields
+	if augmentedOutputFields == nil {
+		augmentedOutputFields = types.GraphQLFieldConfigMap{}
+	}
 	augmentedOutputFields["clientMutationId"] = &types.GraphQLFieldConfig{
 		Type: types.NewGraphQLNonNull(types.GraphQLString),
 	}

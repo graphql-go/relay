@@ -3,7 +3,7 @@ package gqlrelay
 import "github.com/chris-ramon/graphql-go/types"
 
 /*
- Returns a GraphQLFieldConfigArgumentMap appropriate to include
+Returns a GraphQLFieldConfigArgumentMap appropriate to include
 on a field whose return type is a connection type.
 */
 var ConnectionArgs = types.GraphQLFieldConfigArgumentMap{
@@ -21,6 +21,13 @@ var ConnectionArgs = types.GraphQLFieldConfigArgumentMap{
 	},
 }
 
+func NewConnectionArgs(configMap types.GraphQLFieldConfigArgumentMap) types.GraphQLFieldConfigArgumentMap {
+	for fieldName, argConfig := range ConnectionArgs {
+		configMap[fieldName] = argConfig
+	}
+	return configMap
+}
+
 type ConnectionConfig struct {
 	Name             string                      `json:"name"`
 	NodeType         *types.GraphQLObjectType    `json:"nodeType"`
@@ -28,6 +35,10 @@ type ConnectionConfig struct {
 	ConnectionFields types.GraphQLFieldConfigMap `json:"connectionFields"`
 }
 
+type EdgeType struct {
+	Node   interface{}      `json:"node"`
+	Cursor ConnectionCursor `json:"cursor"`
+}
 type GraphQLConnectionDefinitions struct {
 	EdgeType       *types.GraphQLObjectType `json:"edgeType"`
 	ConnectionType *types.GraphQLObjectType `json:"connectionType"`
