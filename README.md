@@ -14,7 +14,7 @@ $ go build && go test ./...
 
 ### TODO:
 - [x] Starwars example
-- [x] HTTP handler to easily create a Relay-compliant GraphQL server _(Moved to: [graphql-go-handler](github.com/sogko/graphql-go-handler))_
+- [x] HTTP handler to easily create a Relay-compliant GraphQL server _(Moved to: [graphql-go-handler](https://github.com/sogko/graphql-go-handler))_
 - [ ] In-code documentation (godocs)
 - [ ] Usage guide / user documentation
 - [ ] End-to-end example (graphql-relay-go + react-relay)
