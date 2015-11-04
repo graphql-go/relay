@@ -1,27 +1,27 @@
 package gqlrelay
 
-import "github.com/chris-ramon/graphql-go/types"
+import "github.com/chris-ramon/graphql"
 
 /*
 Returns a GraphQLFieldConfigArgumentMap appropriate to include
 on a field whose return type is a connection type.
 */
-var ConnectionArgs = types.GraphQLFieldConfigArgumentMap{
-	"before": &types.GraphQLArgumentConfig{
-		Type: types.GraphQLString,
+var ConnectionArgs = graphql.FieldConfigArgument{
+	"before": &graphql.ArgumentConfig{
+		Type: graphql.String,
 	},
-	"after": &types.GraphQLArgumentConfig{
-		Type: types.GraphQLString,
+	"after": &graphql.ArgumentConfig{
+		Type: graphql.String,
 	},
-	"first": &types.GraphQLArgumentConfig{
-		Type: types.GraphQLInt,
+	"first": &graphql.ArgumentConfig{
+		Type: graphql.Int,
 	},
-	"last": &types.GraphQLArgumentConfig{
-		Type: types.GraphQLInt,
+	"last": &graphql.ArgumentConfig{
+		Type: graphql.Int,
 	},
 }
 
-func NewConnectionArgs(configMap types.GraphQLFieldConfigArgumentMap) types.GraphQLFieldConfigArgumentMap {
+func NewConnectionArgs(configMap graphql.FieldConfigArgument) graphql.FieldConfigArgument {
 	for fieldName, argConfig := range ConnectionArgs {
 		configMap[fieldName] = argConfig
 	}
@@ -29,10 +29,10 @@ func NewConnectionArgs(configMap types.GraphQLFieldConfigArgumentMap) types.Grap
 }
 
 type ConnectionConfig struct {
-	Name             string                      `json:"name"`
-	NodeType         *types.GraphQLObjectType    `json:"nodeType"`
-	EdgeFields       types.GraphQLFieldConfigMap `json:"edgeFields"`
-	ConnectionFields types.GraphQLFieldConfigMap `json:"connectionFields"`
+	Name             string                 `json:"name"`
+	NodeType         *graphql.Object        `json:"nodeType"`
+	EdgeFields       graphql.FieldConfigMap `json:"edgeFields"`
+	ConnectionFields graphql.FieldConfigMap `json:"connectionFields"`
 }
 
 type EdgeType struct {
@@ -40,31 +40,31 @@ type EdgeType struct {
 	Cursor ConnectionCursor `json:"cursor"`
 }
 type GraphQLConnectionDefinitions struct {
-	EdgeType       *types.GraphQLObjectType `json:"edgeType"`
-	ConnectionType *types.GraphQLObjectType `json:"connectionType"`
+	EdgeType       *graphql.Object `json:"edgeType"`
+	ConnectionType *graphql.Object `json:"connectionType"`
 }
 
 /*
 The common page info type used by all connections.
 */
-var pageInfoType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+var pageInfoType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "PageInfo",
 	Description: "Information about pagination in a connection.",
-	Fields: types.GraphQLFieldConfigMap{
-		"hasNextPage": &types.GraphQLFieldConfig{
-			Type:        types.NewGraphQLNonNull(types.GraphQLBoolean),
+	Fields: graphql.FieldConfigMap{
+		"hasNextPage": &graphql.FieldConfig{
+			Type:        graphql.NewNonNull(graphql.Boolean),
 			Description: "When paginating forwards, are there more items?",
 		},
-		"hasPreviousPage": &types.GraphQLFieldConfig{
-			Type:        types.NewGraphQLNonNull(types.GraphQLBoolean),
+		"hasPreviousPage": &graphql.FieldConfig{
+			Type:        graphql.NewNonNull(graphql.Boolean),
 			Description: "When paginating backwards, are there more items?",
 		},
-		"startCursor": &types.GraphQLFieldConfig{
-			Type:        types.GraphQLString,
+		"startCursor": &graphql.FieldConfig{
+			Type:        graphql.String,
 			Description: "When paginating backwards, the cursor to continue.",
 		},
-		"endCursor": &types.GraphQLFieldConfig{
-			Type:        types.GraphQLString,
+		"endCursor": &graphql.FieldConfig{
+			Type:        graphql.String,
 			Description: "When paginating forwards, the cursor to continue.",
 		},
 	},
@@ -77,16 +77,16 @@ and whose nodes are of the specified type.
 
 func ConnectionDefinitions(config ConnectionConfig) *GraphQLConnectionDefinitions {
 
-	edgeType := types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	edgeType := graphql.NewObject(graphql.ObjectConfig{
 		Name:        config.Name + "Edge",
 		Description: "An edge in a connection",
-		Fields: types.GraphQLFieldConfigMap{
-			"node": &types.GraphQLFieldConfig{
+		Fields: graphql.FieldConfigMap{
+			"node": &graphql.FieldConfig{
 				Type:        config.NodeType,
 				Description: "The item at the end of the edge",
 			},
-			"cursor": &types.GraphQLFieldConfig{
-				Type:        types.NewGraphQLNonNull(types.GraphQLString),
+			"cursor": &graphql.FieldConfig{
+				Type:        graphql.NewNonNull(graphql.String),
 				Description: " cursor for use in pagination",
 			},
 		},
@@ -95,17 +95,17 @@ func ConnectionDefinitions(config ConnectionConfig) *GraphQLConnectionDefinition
 		edgeType.AddFieldConfig(fieldName, fieldConfig)
 	}
 
-	connectionType := types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	connectionType := graphql.NewObject(graphql.ObjectConfig{
 		Name:        config.Name + "Connection",
 		Description: "A connection to a list of items.",
 
-		Fields: types.GraphQLFieldConfigMap{
-			"pageInfo": &types.GraphQLFieldConfig{
-				Type:        types.NewGraphQLNonNull(pageInfoType),
+		Fields: graphql.FieldConfigMap{
+			"pageInfo": &graphql.FieldConfig{
+				Type:        graphql.NewNonNull(pageInfoType),
 				Description: "Information to aid in pagination.",
 			},
-			"edges": &types.GraphQLFieldConfig{
-				Type:        types.NewGraphQLList(edgeType),
+			"edges": &graphql.FieldConfig{
+				Type:        graphql.NewList(edgeType),
 				Description: "Information to aid in pagination.",
 			},
 		},

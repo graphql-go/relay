@@ -1,17 +1,16 @@
 package starwars_test
 
 import (
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go/examples/starwars"
 	"reflect"
 	"testing"
 )
 
-func graphql(t *testing.T, p gql.GraphqlParams) *types.GraphQLResult {
-	resultChannel := make(chan *types.GraphQLResult)
-	go gql.Graphql(p, resultChannel)
+func testGraphql(t *testing.T, p graphql.Params) *graphql.Result {
+	resultChannel := make(chan *graphql.Result)
+	go graphql.Graphql(p, resultChannel)
 	result := <-resultChannel
 	return result
 }
@@ -31,7 +30,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
@@ -47,7 +46,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -71,7 +70,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
@@ -94,7 +93,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -118,7 +117,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
@@ -147,7 +146,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -171,7 +170,7 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
@@ -181,7 +180,7 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -217,7 +216,7 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"name": "Alliance to Restore the Republic",
@@ -263,7 +262,7 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})

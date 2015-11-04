@@ -2,20 +2,19 @@ package gqlrelay_test
 
 import (
 	"fmt"
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go"
 	"reflect"
 	"testing"
 )
 
 type user struct {
-	Id   int    `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 type photo struct {
-	Id    int `json:"id"`
+	ID    int `json:"id"`
 	Width int `json:"width"`
 }
 
@@ -30,11 +29,11 @@ var nodeTestPhotoData = map[string]*photo{
 
 // declare types first, define later in init()
 // because they all depend on nodeTestDef
-var nodeTestUserType *types.GraphQLObjectType
-var nodeTestPhotoType *types.GraphQLObjectType
+var nodeTestUserType *graphql.Object
+var nodeTestPhotoType *graphql.Object
 
 var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
-	IdFetcher: func(id string, info types.GraphQLResolveInfo) interface{} {
+	IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
 		if user, ok := nodeTestUserData[id]; ok {
 			return user
 		}
@@ -43,7 +42,7 @@ var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 		}
 		return nil
 	},
-	TypeResolve: func(value interface{}, info types.GraphQLResolveInfo) *types.GraphQLObjectType {
+	TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
 		switch value.(type) {
 		case *user:
 			return nodeTestUserType
@@ -54,50 +53,50 @@ var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 		}
 	},
 })
-var nodeTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+var nodeTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
-	Fields: types.GraphQLFieldConfigMap{
+	Fields: graphql.FieldConfigMap{
 		"node": nodeTestDef.NodeField,
 	},
 })
 
 // becareful not to define schema here, since nodeTestUserType and nodeTestPhotoType wouldn't be defined till init()
-var nodeTestSchema types.GraphQLSchema
+var nodeTestSchema graphql.Schema
 
 func init() {
-	nodeTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	nodeTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
-		Fields: types.GraphQLFieldConfigMap{
-			"id": &types.GraphQLFieldConfig{
-				Type: types.NewGraphQLNonNull(types.GraphQLID),
+		Fields: graphql.FieldConfigMap{
+			"id": &graphql.FieldConfig{
+				Type: graphql.NewNonNull(graphql.ID),
 			},
-			"name": &types.GraphQLFieldConfig{
-				Type: types.GraphQLString,
+			"name": &graphql.FieldConfig{
+				Type: graphql.String,
 			},
 		},
-		Interfaces: []*types.GraphQLInterfaceType{nodeTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{nodeTestDef.NodeInterface},
 	})
-	nodeTestPhotoType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	nodeTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
-		Fields: types.GraphQLFieldConfigMap{
-			"id": &types.GraphQLFieldConfig{
-				Type: types.NewGraphQLNonNull(types.GraphQLID),
+		Fields: graphql.FieldConfigMap{
+			"id": &graphql.FieldConfig{
+				Type: graphql.NewNonNull(graphql.ID),
 			},
-			"width": &types.GraphQLFieldConfig{
-				Type: types.GraphQLInt,
+			"width": &graphql.FieldConfig{
+				Type: graphql.Int,
 			},
 		},
-		Interfaces: []*types.GraphQLInterfaceType{nodeTestDef.NodeInterface},
+		Interfaces: []*graphql.Interface{nodeTestDef.NodeInterface},
 	})
 
-	nodeTestSchema, _ = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+	nodeTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 		Query: nodeTestQueryType,
 	})
 }
 
-func graphql(t *testing.T, p gql.GraphqlParams) *types.GraphQLResult {
-	resultChannel := make(chan *types.GraphQLResult)
-	go gql.Graphql(p, resultChannel)
+func testGraphql(t *testing.T, p graphql.Params) *graphql.Result {
+	resultChannel := make(chan *graphql.Result)
+	go graphql.Graphql(p, resultChannel)
 	result := <-resultChannel
 	return result
 }
@@ -107,14 +106,14 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *tes
           id
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id": "1",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -128,14 +127,14 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForPhotos(t *te
           id
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id": "4",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -152,7 +151,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *t
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":   "1",
@@ -160,7 +159,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *t
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -177,7 +176,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t 
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":    "4",
@@ -185,7 +184,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t 
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -200,7 +199,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(
           __typename
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":         "1",
@@ -208,7 +207,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -223,7 +222,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos
           __typename
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":         "4",
@@ -231,7 +230,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -248,14 +247,14 @@ func TestNodeInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id": "1",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -269,12 +268,12 @@ func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing
           id
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": nil,
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -299,7 +298,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__type": map[string]interface{}{
 				"name": "Node",
@@ -319,7 +318,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -351,7 +350,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__schema": map[string]interface{}{
 				"queryType": map[string]interface{}{
@@ -380,7 +379,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})

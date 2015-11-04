@@ -11,12 +11,12 @@ JSON objects in a more complex demo.
 */
 
 type Ship struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 type Faction struct {
-	Id    string   `json:"id"`
+	ID    string   `json:"id"`
 	Name  string   `json:"name"`
 	Ships []string `json:"ships"`
 }
@@ -67,11 +67,11 @@ func CreateShip(shipName string, factionId string) *Ship {
 		fmt.Sprintf("%v", nextShip),
 		shipName,
 	}
-	ships[newShip.Id] = newShip
+	ships[newShip.ID] = newShip
 
 	faction := GetFaction(factionId)
 	if faction != nil {
-		faction.Ships = append(faction.Ships, newShip.Id)
+		faction.Ships = append(faction.Ships, newShip.ID)
 	}
 	return newShip
 }

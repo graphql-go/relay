@@ -1,9 +1,8 @@
 package starwars_test
 
 import (
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go/examples/starwars"
 	"reflect"
 	"testing"
@@ -20,7 +19,7 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
           faction {
             name
           }
-          clientMutationId
+          clientMutationID
         }
       }
     `
@@ -28,10 +27,10 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
 		"input": map[string]interface{}{
 			"shipName":         "B-Wing",
 			"factionId":        "1",
-			"clientMutationId": "abcde",
+			"clientMutationID": "abcde",
 		},
 	}
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"introduceShip": map[string]interface{}{
 				"ship": map[string]interface{}{
@@ -41,11 +40,11 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
 				"faction": map[string]interface{}{
 					"name": "Alliance to Restore the Republic",
 				},
-				"clientMutationId": "abcde",
+				"clientMutationID": "abcde",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:         starwars.Schema,
 		RequestString:  query,
 		VariableValues: params,

@@ -1,31 +1,31 @@
 package gqlrelay
 
 import (
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
 )
 
 type ResolveSingleInputFn func(input interface{}) interface{}
 type PluralIdentifyingRootFieldConfig struct {
-	ArgName            string                  `json:"argName"`
-	InputType          types.GraphQLInputType  `json:"inputType"`
-	OutputType         types.GraphQLOutputType `json:"outputType"`
-	ResolveSingleInput ResolveSingleInputFn    `json:"resolveSingleInput"`
-	Description        string                  `json:"description"`
+	ArgName            string               `json:"argName"`
+	InputType          graphql.Input        `json:"inputType"`
+	OutputType         graphql.Output       `json:"outputType"`
+	ResolveSingleInput ResolveSingleInputFn `json:"resolveSingleInput"`
+	Description        string               `json:"description"`
 }
 
-func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *types.GraphQLFieldConfig {
-	inputArgs := types.GraphQLFieldConfigArgumentMap{}
+func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphql.FieldConfig {
+	inputArgs := graphql.FieldConfigArgument{}
 	if config.ArgName != "" {
-		inputArgs[config.ArgName] = &types.GraphQLArgumentConfig{
-			Type: types.NewGraphQLNonNull(types.NewGraphQLList(types.NewGraphQLNonNull(config.InputType))),
+		inputArgs[config.ArgName] = &graphql.ArgumentConfig{
+			Type: graphql.NewNonNull(graphql.NewList(graphql.NewNonNull(config.InputType))),
 		}
 	}
 
-	return &types.GraphQLFieldConfig{
+	return &graphql.FieldConfig{
 		Description: config.Description,
-		Type:        types.NewGraphQLList(config.OutputType),
+		Type:        graphql.NewList(config.OutputType),
 		Args:        inputArgs,
-		Resolve: func(p types.GQLFRParams) interface{} {
+		Resolve: func(p graphql.GQLFRParams) interface{} {
 			inputs, ok := p.Args[config.ArgName]
 			if !ok {
 				return nil

@@ -1,9 +1,8 @@
 package gqlrelay_test
 
 import (
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go"
 	"reflect"
 	"testing"
@@ -16,38 +15,38 @@ var connectionTestAllUsers = []interface{}{
 	&user{Name: "Joe"},
 	&user{Name: "Tim"},
 }
-var connectionTestUserType *types.GraphQLObjectType
-var connectionTestQueryType *types.GraphQLObjectType
-var connectionTestSchema types.GraphQLSchema
+var connectionTestUserType *graphql.Object
+var connectionTestQueryType *graphql.Object
+var connectionTestSchema graphql.Schema
 var connectionTestConnectionDef *gqlrelay.GraphQLConnectionDefinitions
 
 func init() {
-	connectionTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	connectionTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
-		Fields: types.GraphQLFieldConfigMap{
-			"name": &types.GraphQLFieldConfig{
-				Type: types.GraphQLString,
+		Fields: graphql.FieldConfigMap{
+			"name": &graphql.FieldConfig{
+				Type: graphql.String,
 			},
 			// re-define `friends` field later because `connectionTestUserType` has `connectionTestConnectionDef` has `connectionTestUserType` (cyclic-reference)
-			"friends": &types.GraphQLFieldConfig{},
+			"friends": &graphql.FieldConfig{},
 		},
 	})
 
 	connectionTestConnectionDef = gqlrelay.ConnectionDefinitions(gqlrelay.ConnectionConfig{
 		Name:     "Friend",
 		NodeType: connectionTestUserType,
-		EdgeFields: types.GraphQLFieldConfigMap{
-			"friendshipTime": &types.GraphQLFieldConfig{
-				Type: types.GraphQLString,
-				Resolve: func(p types.GQLFRParams) interface{} {
+		EdgeFields: graphql.FieldConfigMap{
+			"friendshipTime": &graphql.FieldConfig{
+				Type: graphql.String,
+				Resolve: func(p graphql.GQLFRParams) interface{} {
 					return "Yesterday"
 				},
 			},
 		},
-		ConnectionFields: types.GraphQLFieldConfigMap{
-			"totalCount": &types.GraphQLFieldConfig{
-				Type: types.GraphQLInt,
-				Resolve: func(p types.GQLFRParams) interface{} {
+		ConnectionFields: graphql.FieldConfigMap{
+			"totalCount": &graphql.FieldConfig{
+				Type: graphql.Int,
+				Resolve: func(p graphql.GQLFRParams) interface{} {
 					return len(connectionTestAllUsers)
 				},
 			},
@@ -55,29 +54,29 @@ func init() {
 	})
 
 	// define `friends` field here after getting connection definition
-	connectionTestUserType.AddFieldConfig("friends", &types.GraphQLFieldConfig{
+	connectionTestUserType.AddFieldConfig("friends", &graphql.FieldConfig{
 		Type: connectionTestConnectionDef.ConnectionType,
 		Args: gqlrelay.ConnectionArgs,
-		Resolve: func(p types.GQLFRParams) interface{} {
+		Resolve: func(p graphql.GQLFRParams) interface{} {
 			arg := gqlrelay.NewConnectionArguments(p.Args)
 			res := gqlrelay.ConnectionFromArray(connectionTestAllUsers, arg)
 			return res
 		},
 	})
 
-	connectionTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	connectionTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: types.GraphQLFieldConfigMap{
-			"user": &types.GraphQLFieldConfig{
+		Fields: graphql.FieldConfigMap{
+			"user": &graphql.FieldConfig{
 				Type: connectionTestUserType,
-				Resolve: func(p types.GQLFRParams) interface{} {
+				Resolve: func(p graphql.GQLFRParams) interface{} {
 					return connectionTestAllUsers[0]
 				},
 			},
 		},
 	})
 	var err error
-	connectionTestSchema, err = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+	connectionTestSchema, err = graphql.NewSchema(graphql.SchemaConfig{
 		Query: connectionTestQueryType,
 	})
 	if err != nil {
@@ -102,7 +101,7 @@ func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
         }
       }
     `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"user": map[string]interface{}{
 				"friends": map[string]interface{}{
@@ -125,7 +124,7 @@ func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        connectionTestSchema,
 		RequestString: query,
 	})

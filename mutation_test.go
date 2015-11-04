@@ -1,10 +1,9 @@
 package gqlrelay_test
 
 import (
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/errors"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/gqlerrors"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go"
 	"reflect"
 	"testing"
@@ -17,15 +16,15 @@ func testAsyncDataMutation(resultChan *chan int) {
 	*resultChan <- int(1)
 }
 
-var simpleMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.MutationConfig{
+var simpleMutationTest = gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
 	Name:        "SimpleMutation",
-	InputFields: types.InputObjectConfigFieldMap{},
-	OutputFields: types.GraphQLFieldConfigMap{
-		"result": &types.GraphQLFieldConfig{
-			Type: types.GraphQLInt,
+	InputFields: graphql.InputObjectConfigFieldMap{},
+	OutputFields: graphql.FieldConfigMap{
+		"result": &graphql.FieldConfig{
+			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
 		return map[string]interface{}{
 			"result": 1,
 		}
@@ -33,15 +32,15 @@ var simpleMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.Mutation
 })
 
 // async mutation
-var simplePromiseMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.MutationConfig{
+var simplePromiseMutationTest = gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
 	Name:        "SimplePromiseMutation",
-	InputFields: types.InputObjectConfigFieldMap{},
-	OutputFields: types.GraphQLFieldConfigMap{
-		"result": &types.GraphQLFieldConfig{
-			Type: types.GraphQLInt,
+	InputFields: graphql.InputObjectConfigFieldMap{},
+	OutputFields: graphql.FieldConfigMap{
+		"result": &graphql.FieldConfig{
+			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info types.GraphQLResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
 		c := make(chan int)
 		go testAsyncDataMutation(&c)
 		result := <-c
@@ -51,15 +50,15 @@ var simplePromiseMutationTest = gqlrelay.MutationWithClientMutationId(gqlrelay.M
 	},
 })
 
-var mutationTestType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+var mutationTestType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
-	Fields: types.GraphQLFieldConfigMap{
+	Fields: graphql.FieldConfigMap{
 		"simpleMutation":        simpleMutationTest,
 		"simplePromiseMutation": simplePromiseMutationTest,
 	},
 })
 
-var mutationTestSchema, _ = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+var mutationTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Query:    mutationTestType,
 	Mutation: mutationTestType,
 })
@@ -73,14 +72,14 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *te
           }
         }
       `
-	expected := &types.GraphQLResult{
-		Errors: []graphqlerrors.GraphQLFormattedError{
-			graphqlerrors.GraphQLFormattedError{
+	expected := &graphql.Result{
+		Errors: []gqlerrors.FormattedError{
+			gqlerrors.FormattedError{
 				Message: `Field "simpleMutation" argument "input" of type "SimpleMutationInput!" is required but not provided.`,
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -91,21 +90,21 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *te
 func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMutationId(t *testing.T) {
 	query := `
         mutation M {
-          simpleMutation(input: {clientMutationId: "abc"}) {
+          simpleMutation(input: {clientMutationID: "abc"}) {
             result
-            clientMutationId
+            clientMutationID
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"simpleMutation": map[string]interface{}{
 				"result":           1,
-				"clientMutationId": "abc",
+				"clientMutationID": "abc",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -118,21 +117,21 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMuta
 func TestMutation_WithClientMutationId_BehavesCorrectly_SupportsPromiseMutations(t *testing.T) {
 	query := `
         mutation M {
-          simplePromiseMutation(input: {clientMutationId: "abc"}) {
+          simplePromiseMutation(input: {clientMutationID: "abc"}) {
             result
-            clientMutationId
+            clientMutationID
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"simplePromiseMutation": map[string]interface{}{
 				"result":           1,
-				"clientMutationId": "abc",
+				"clientMutationID": "abc",
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -158,14 +157,14 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__type": map[string]interface{}{
 				"name": "SimpleMutationInput",
 				"kind": "INPUT_OBJECT",
 				"inputFields": []interface{}{
 					map[string]interface{}{
-						"name": "clientMutationId",
+						"name": "clientMutationID",
 						"type": map[string]interface{}{
 							"name": nil,
 							"kind": "NON_NULL",
@@ -179,7 +178,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -205,7 +204,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__type": map[string]interface{}{
 				"name": "SimpleMutationPayload",
@@ -220,7 +219,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 						},
 					},
 					map[string]interface{}{
-						"name": "clientMutationId",
+						"name": "clientMutationID",
 						"type": map[string]interface{}{
 							"name": nil,
 							"kind": "NON_NULL",
@@ -234,7 +233,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -267,7 +266,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
           }
         }
       }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__schema": map[string]interface{}{
 				"mutationType": map[string]interface{}{
@@ -317,7 +316,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})

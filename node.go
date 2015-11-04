@@ -4,21 +4,21 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
 	"strings"
 )
 
 type NodeDefinitions struct {
-	NodeInterface *types.GraphQLInterfaceType
-	NodeField     *types.GraphQLFieldConfig
+	NodeInterface *graphql.Interface
+	NodeField     *graphql.FieldConfig
 }
 
 type NodeDefinitionsConfig struct {
-	IdFetcher   IdFetcherFn
-	TypeResolve types.ResolveTypeFn
+	IDFetcher   IDFetcherFn
+	TypeResolve graphql.ResolveTypeFn
 }
-type IdFetcherFn func(id string, info types.GraphQLResolveInfo) interface{}
-type GlobalIdFetcherFn func(obj interface{}, info types.GraphQLResolveInfo) string
+type IDFetcherFn func(id string, info graphql.ResolveInfo) interface{}
+type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo) string
 
 /*
  Given a function to map from an ID to an underlying object, and a function
@@ -31,38 +31,38 @@ type GlobalIdFetcherFn func(obj interface{}, info types.GraphQLResolveInfo) stri
 interface without a provided `resolveType` method.
 */
 func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
-	nodeInterface := types.NewGraphQLInterfaceType(types.GraphQLInterfaceTypeConfig{
+	nodeInterface := graphql.NewInterface(graphql.InterfaceConfig{
 		Name:        "Node",
 		Description: "An object with an ID",
-		Fields: types.GraphQLFieldConfigMap{
-			"id": &types.GraphQLFieldConfig{
-				Type:        types.NewGraphQLNonNull(types.GraphQLID),
+		Fields: graphql.FieldConfigMap{
+			"id": &graphql.FieldConfig{
+				Type:        graphql.NewNonNull(graphql.ID),
 				Description: "The id of the object",
 			},
 		},
 		ResolveType: config.TypeResolve,
 	})
 
-	nodeField := &types.GraphQLFieldConfig{
+	nodeField := &graphql.FieldConfig{
 		Name:        "Node",
 		Description: "Fetches an object given its ID",
 		Type:        nodeInterface,
-		Args: types.GraphQLFieldConfigArgumentMap{
-			"id": &types.GraphQLArgumentConfig{
-				Type:        types.NewGraphQLNonNull(types.GraphQLID),
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type:        graphql.NewNonNull(graphql.ID),
 				Description: "The ID of an object",
 			},
 		},
-		Resolve: func(p types.GQLFRParams) interface{} {
-			if config.IdFetcher == nil {
+		Resolve: func(p graphql.GQLFRParams) interface{} {
+			if config.IDFetcher == nil {
 				return nil
 			}
 			id := ""
 			if iid, ok := p.Args["id"]; ok {
 				id = fmt.Sprintf("%v", iid)
 			}
-			fetchedId := config.IdFetcher(id, p.Info)
-			return fetchedId
+			fetchedID := config.IDFetcher(id, p.Info)
+			return fetchedID
 		},
 	}
 	return &NodeDefinitions{
@@ -71,16 +71,16 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 	}
 }
 
-type ResolvedGlobalId struct {
+type ResolvedGlobalID struct {
 	Type string `json:"type"`
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 }
 
 /*
 Takes a type name and an ID specific to that type name, and returns a
 "global ID" that is unique among all types.
 */
-func ToGlobalId(ttype string, id string) string {
+func ToGlobalID(ttype string, id string) string {
 	str := ttype + ":" + id
 	encStr := base64.StdEncoding.EncodeToString([]byte(str))
 	return encStr
@@ -90,19 +90,19 @@ func ToGlobalId(ttype string, id string) string {
 Takes the "global ID" created by toGlobalID, and returns the type name and ID
 used to create it.
 */
-func FromGlobalId(globalId string) *ResolvedGlobalId {
-	strId := ""
-	b, err := base64.StdEncoding.DecodeString(globalId)
+func FromGlobalID(globalID string) *ResolvedGlobalID {
+	strID := ""
+	b, err := base64.StdEncoding.DecodeString(globalID)
 	if err == nil {
-		strId = string(b)
+		strID = string(b)
 	}
-	tokens := strings.Split(strId, ":")
+	tokens := strings.Split(strID, ":")
 	if len(tokens) < 2 {
 		return nil
 	}
-	return &ResolvedGlobalId{
+	return &ResolvedGlobalID{
 		Type: tokens[0],
-		Id:   tokens[1],
+		ID:   tokens[1],
 	}
 }
 
@@ -112,12 +112,12 @@ construct the ID from the provided typename. The type-specific ID is fetcher
 by calling idFetcher on the object, or if not provided, by accessing the `id`
 property on the object.
 */
-func GlobalIdField(typeName string, idFetcher GlobalIdFetcherFn) *types.GraphQLFieldConfig {
-	return &types.GraphQLFieldConfig{
+func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.FieldConfig {
+	return &graphql.FieldConfig{
 		Name:        "id",
 		Description: "The ID of an object",
-		Type:        types.NewGraphQLNonNull(types.GraphQLID),
-		Resolve: func(p types.GQLFRParams) interface{} {
+		Type:        graphql.NewNonNull(graphql.ID),
+		Resolve: func(p graphql.GQLFRParams) interface{} {
 			id := ""
 			if idFetcher != nil {
 				fetched := idFetcher(p.Source, p.Info)
@@ -134,8 +134,8 @@ func GlobalIdField(typeName string, idFetcher GlobalIdFetcherFn) *types.GraphQLF
 					}
 				}
 			}
-			globalId := ToGlobalId(typeName, id)
-			return globalId
+			globalID := ToGlobalID(typeName, id)
+			return globalID
 		},
 	}
 }

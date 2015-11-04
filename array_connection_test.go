@@ -1,7 +1,7 @@
 package gqlrelay_test
 
 import (
-	"github.com/chris-ramon/graphql-go/testutil"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go"
 	"reflect"
 	"testing"

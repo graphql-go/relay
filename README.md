@@ -6,6 +6,10 @@ See a live demo of here: http://bit.ly/try-graphql-go
 
 Source code for demo can be found at https://github.com/sogko/golang-graphql-playground
 
+### Notes:
+This is based on alpha version of `graphql-go` and `graphql-relay-go`. 
+Be sure to watch both repositories for latest changes.
+
 ### Tutorial
 [Learn Golang + GraphQL + Relay Part 2: Your first Relay application]( https://wehavefaces.net/learn-golang-graphql-relay-2-a56cbcc3e341)
 

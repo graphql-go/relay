@@ -1,9 +1,8 @@
 package starwars_test
 
 import (
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go/examples/starwars"
 	"reflect"
 	"testing"
@@ -18,7 +17,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheR
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"rebels": map[string]interface{}{
 				"id":   "RmFjdGlvbjox",
@@ -26,7 +25,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheR
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -45,7 +44,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheRebels(t *testin
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":   "RmFjdGlvbjox",
@@ -53,7 +52,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheRebels(t *testin
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -70,7 +69,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheE
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"empire": map[string]interface{}{
 				"id":   "RmFjdGlvbjoy",
@@ -78,7 +77,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheE
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -97,7 +96,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testin
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":   "RmFjdGlvbjoy",
@@ -105,7 +104,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testin
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -124,7 +123,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheXWing(t *testing
           }
         }
       `
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"node": map[string]interface{}{
 				"id":   "U2hpcDox",
@@ -132,7 +131,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheXWing(t *testing
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})

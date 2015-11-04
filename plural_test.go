@@ -2,33 +2,32 @@ package gqlrelay_test
 
 import (
 	"fmt"
-	"github.com/chris-ramon/graphql-go"
-	"github.com/chris-ramon/graphql-go/testutil"
-	"github.com/chris-ramon/graphql-go/types"
+	"github.com/chris-ramon/graphql"
+	"github.com/chris-ramon/graphql/testutil"
 	"github.com/sogko/graphql-relay-go"
 	"reflect"
 	"testing"
 )
 
-var pluralTestUserType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
-	Fields: types.GraphQLFieldConfigMap{
-		"username": &types.GraphQLFieldConfig{
-			Type: types.GraphQLString,
+	Fields: graphql.FieldConfigMap{
+		"username": &graphql.FieldConfig{
+			Type: graphql.String,
 		},
-		"url": &types.GraphQLFieldConfig{
-			Type: types.GraphQLString,
+		"url": &graphql.FieldConfig{
+			Type: graphql.String,
 		},
 	},
 })
 
-var pluralTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
-	Fields: types.GraphQLFieldConfigMap{
+	Fields: graphql.FieldConfigMap{
 		"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
 			ArgName:     "usernames",
 			Description: "Map from a username to the user",
-			InputType:   types.GraphQLString,
+			InputType:   graphql.String,
 			OutputType:  pluralTestUserType,
 			ResolveSingleInput: func(username interface{}) interface{} {
 				return map[string]interface{}{
@@ -40,7 +39,7 @@ var pluralTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConf
 	},
 })
 
-var pluralTestSchema, _ = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+var pluralTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Query: pluralTestQueryType,
 })
 
@@ -51,7 +50,7 @@ func TestPluralIdentifyingRootField_AllowsFetching(t *testing.T) {
         url
       }
     }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"usernames": []interface{}{
 				map[string]interface{}{
@@ -69,7 +68,7 @@ func TestPluralIdentifyingRootField_AllowsFetching(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -110,7 +109,7 @@ func TestPluralIdentifyingRootField_CorrectlyIntrospects(t *testing.T) {
         }
       }
     }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"__schema": map[string]interface{}{
 				"queryType": map[string]interface{}{
@@ -148,7 +147,7 @@ func TestPluralIdentifyingRootField_CorrectlyIntrospects(t *testing.T) {
 			},
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -159,19 +158,19 @@ func TestPluralIdentifyingRootField_CorrectlyIntrospects(t *testing.T) {
 
 func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *testing.T) {
 
-	var pluralTestQueryType = types.NewGraphQLObjectType(types.GraphQLObjectTypeConfig{
+	var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: types.GraphQLFieldConfigMap{
+		Fields: graphql.FieldConfigMap{
 			"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
 				ArgName:     "usernames",
 				Description: "Map from a username to the user",
-				InputType:   types.GraphQLString,
+				InputType:   graphql.String,
 				OutputType:  pluralTestUserType,
 			}),
 		},
 	})
 
-	var pluralTestSchema, _ = types.NewGraphQLSchema(types.GraphQLSchemaConfig{
+	var pluralTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 		Query: pluralTestQueryType,
 	})
 
@@ -181,12 +180,12 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
         url
       }
     }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"usernames": nil,
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -202,12 +201,12 @@ func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified
         url
       }
     }`
-	expected := &types.GraphQLResult{
+	expected := &graphql.Result{
 		Data: map[string]interface{}{
 			"usernames": nil,
 		},
 	}
-	result := graphql(t, gql.GraphqlParams{
+	result := testGraphql(t, graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
