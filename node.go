@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/chris-ramon/graphql"
+	"github.com/graphql-go/graphql"
 	"strings"
 )
 

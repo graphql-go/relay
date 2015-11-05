@@ -1,6 +1,6 @@
 package gqlrelay
 
-import "github.com/chris-ramon/graphql"
+import "github.com/graphql-go/graphql"
 
 /*
 Returns a GraphQLFieldConfigArgumentMap appropriate to include
