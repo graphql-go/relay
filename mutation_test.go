@@ -1,10 +1,10 @@
-package gqlrelay_test
+package relay_test
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
 	"time"
@@ -16,7 +16,7 @@ func testAsyncDataMutation(resultChan *chan int) {
 	*resultChan <- int(1)
 }
 
-var simpleMutationTest = gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
+var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
 	Name:        "SimpleMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
 	OutputFields: graphql.FieldConfigMap{
@@ -32,7 +32,7 @@ var simpleMutationTest = gqlrelay.MutationWithClientMutationID(gqlrelay.Mutation
 })
 
 // async mutation
-var simplePromiseMutationTest = gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
+var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
 	Name:        "SimplePromiseMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
 	OutputFields: graphql.FieldConfigMap{

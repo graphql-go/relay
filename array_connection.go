@@ -1,4 +1,4 @@
-package gqlrelay
+package relay
 
 import (
 	"encoding/base64"

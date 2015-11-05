@@ -2,8 +2,8 @@ package starwars_test
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go/examples/starwars"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay/examples/starwars"
 	"reflect"
 	"testing"
 )

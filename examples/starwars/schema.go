@@ -2,7 +2,7 @@ package starwars
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
+	"github.com/graphql-go/relay"
 )
 
 /**
@@ -86,7 +86,7 @@ import (
 // - shipType refers to
 // - nodeDefinitions
 
-var nodeDefinitions *gqlrelay.NodeDefinitions
+var nodeDefinitions *relay.NodeDefinitions
 var shipType *graphql.Object
 var factionType *graphql.Object
 
@@ -101,10 +101,10 @@ func init() {
 	 * The first method is the way we resolve an ID to its object. The second is the
 	 * way we resolve an object that implements node to its type.
 	 */
-	nodeDefinitions = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
+	nodeDefinitions = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 		IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
 			// resolve id from global id
-			resolvedId := gqlrelay.FromGlobalID(id)
+			resolvedId := relay.FromGlobalID(id)
 
 			// based on id and its type, return the object
 			if resolvedId.Type == "Faction" {
@@ -137,7 +137,7 @@ func init() {
 		Name:        "Ship",
 		Description: "A ship in the Star Wars saga",
 		Fields: graphql.FieldConfigMap{
-			"id": gqlrelay.GlobalIDField("Ship", nil),
+			"id": relay.GlobalIDField("Ship", nil),
 			"name": &graphql.FieldConfig{
 				Type:        graphql.String,
 				Description: "The name of the ship.",
@@ -164,7 +164,7 @@ func init() {
 	 *     node: Ship
 	 *   }
 	 */
-	shipConnectionDefinition := gqlrelay.ConnectionDefinitions(gqlrelay.ConnectionConfig{
+	shipConnectionDefinition := relay.ConnectionDefinitions(relay.ConnectionConfig{
 		Name:     "Ship",
 		NodeType: shipType,
 	})
@@ -183,17 +183,17 @@ func init() {
 		Name:        "Faction",
 		Description: "A faction in the Star Wars saga",
 		Fields: graphql.FieldConfigMap{
-			"id": gqlrelay.GlobalIDField("Faction", nil),
+			"id": relay.GlobalIDField("Faction", nil),
 			"name": &graphql.FieldConfig{
 				Type:        graphql.String,
 				Description: "The name of the faction.",
 			},
 			"ships": &graphql.FieldConfig{
 				Type: shipConnectionDefinition.ConnectionType,
-				Args: gqlrelay.ConnectionArgs,
+				Args: relay.ConnectionArgs,
 				Resolve: func(p graphql.GQLFRParams) interface{} {
 					// convert args map[string]interface into ConnectionArguments
-					args := gqlrelay.NewConnectionArguments(p.Args)
+					args := relay.NewConnectionArguments(p.Args)
 
 					// get ship objects from current faction
 					ships := []interface{}{}
@@ -205,7 +205,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return gqlrelay.ConnectionFromArray(ships, args)
+					return relay.ConnectionFromArray(ships, args)
 				},
 			},
 		},
@@ -261,7 +261,7 @@ func init() {
 	 *     faction: Faction
 	 *   }
 	 */
-	shipMutation := gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
+	shipMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
 		Name: "IntroduceShip",
 		InputFields: graphql.InputObjectConfigFieldMap{
 			"shipName": &graphql.InputObjectFieldConfig{

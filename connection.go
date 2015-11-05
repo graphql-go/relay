@@ -1,4 +1,4 @@
-package gqlrelay
+package relay
 
 import "github.com/graphql-go/graphql"
 

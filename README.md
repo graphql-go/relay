@@ -15,7 +15,7 @@ Be sure to watch both repositories for latest changes.
 
 ### Test
 ```bash
-$ go get github.com/graphql-go/graphql-relay-go
+$ go get github.com/graphql-go/relay
 $ go build && go test ./...
 ```
 

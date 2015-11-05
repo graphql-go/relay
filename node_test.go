@@ -1,10 +1,10 @@
-package gqlrelay_test
+package relay_test
 
 import (
 	"fmt"
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
 )
@@ -32,7 +32,7 @@ var nodeTestPhotoData = map[string]*photo{
 var nodeTestUserType *graphql.Object
 var nodeTestPhotoType *graphql.Object
 
-var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
+var nodeTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 	IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
 		if user, ok := nodeTestUserData[id]; ok {
 			return user

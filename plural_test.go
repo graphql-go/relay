@@ -1,10 +1,10 @@
-package gqlrelay_test
+package relay_test
 
 import (
 	"fmt"
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
 )
@@ -24,7 +24,7 @@ var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
 var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.FieldConfigMap{
-		"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
+		"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
 			ArgName:     "usernames",
 			Description: "Map from a username to the user",
 			InputType:   graphql.String,
@@ -161,7 +161,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 	var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: graphql.FieldConfigMap{
-			"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
+			"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
 				ArgName:     "usernames",
 				Description: "Map from a username to the user",
 				InputType:   graphql.String,
