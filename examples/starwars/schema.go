@@ -1,8 +1,8 @@
 package starwars
 
 import (
-	"github.com/chris-ramon/graphql"
-	"github.com/sogko/graphql-relay-go"
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql-relay-go"
 )
 
 /**

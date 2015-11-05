@@ -1,7 +1,7 @@
 package gqlrelay
 
 import (
-	"github.com/chris-ramon/graphql"
+	"github.com/graphql-go/graphql"
 )
 
 type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{}

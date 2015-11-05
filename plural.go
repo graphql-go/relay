@@ -1,7 +1,7 @@
 package gqlrelay
 
 import (
-	"github.com/chris-ramon/graphql"
+	"github.com/graphql-go/graphql"
 )
 
 type ResolveSingleInputFn func(input interface{}) interface{}
