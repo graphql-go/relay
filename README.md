@@ -1,6 +1,6 @@
 # graphql-relay-go
 
-A Go/Golang library to help construct a [graphql-go](https://github.com/graphql-go/graphql-go) server supporting react-relay.
+A Go/Golang library to help construct a [graphql-go](https://github.com/graphql-go/graphql) server supporting react-relay.
 
 See a live demo of here: http://bit.ly/try-graphql-go
 
