@@ -68,7 +68,7 @@ func TestPluralIdentifyingRootField_AllowsFetching(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -147,7 +147,7 @@ func TestPluralIdentifyingRootField_CorrectlyIntrospects(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -185,7 +185,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 			"usernames": nil,
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -206,7 +206,7 @@ func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified
 			"usernames": nil,
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})

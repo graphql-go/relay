@@ -93,13 +93,6 @@ func init() {
 		Query: nodeTestQueryType,
 	})
 }
-
-func testGraphql(t *testing.T, p graphql.Params) *graphql.Result {
-	resultChannel := make(chan *graphql.Result)
-	go graphql.Graphql(p, resultChannel)
-	result := <-resultChannel
-	return result
-}
 func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *testing.T) {
 	query := `{
         node(id: "1") {
@@ -113,7 +106,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *tes
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -134,7 +127,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForPhotos(t *te
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -159,7 +152,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *t
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -184,7 +177,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t 
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -207,7 +200,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -230,7 +223,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -254,7 +247,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -273,7 +266,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing
 			"node": nil,
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -318,7 +311,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -379,7 +372,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})

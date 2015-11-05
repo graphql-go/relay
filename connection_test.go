@@ -124,7 +124,7 @@ func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        connectionTestSchema,
 		RequestString: query,
 	})

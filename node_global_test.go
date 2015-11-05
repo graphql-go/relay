@@ -130,7 +130,7 @@ func TestGlobalIDFields_GivesDifferentIDs(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        globalIDTestSchema,
 		RequestString: query,
 	})
@@ -166,7 +166,7 @@ func TestGlobalIDFields_RefetchesTheIDs(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        globalIDTestSchema,
 		RequestString: query,
 	})

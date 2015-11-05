@@ -8,13 +8,6 @@ import (
 	"testing"
 )
 
-func testGraphql(t *testing.T, p graphql.Params) *graphql.Result {
-	resultChannel := make(chan *graphql.Result)
-	go graphql.Graphql(p, resultChannel)
-	result := <-resultChannel
-	return result
-}
-
 func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *testing.T) {
 	query := `
         query RebelsShipsQuery {
@@ -46,7 +39,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstShipOfTheRebels(t *test
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -93,7 +86,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheFirstTwoShipsOfTheRebelsWith
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -146,7 +139,7 @@ func TestConnection_TestFetching_CorrectlyFetchesTheNextThreeShipsOfTheRebelsWit
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -180,7 +173,7 @@ func TestConnection_TestFetching_CorrectlyFetchesNoShipsOfTheRebelsAtTheEndOfThe
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -262,7 +255,7 @@ func TestConnection_TestFetching_CorrectlyIdentifiesTheEndOfTheList(t *testing.T
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})

@@ -79,7 +79,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *te
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -104,7 +104,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMuta
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -131,7 +131,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_SupportsPromiseMutations
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -178,7 +178,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -233,7 +233,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -316,7 +316,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Graphql(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
