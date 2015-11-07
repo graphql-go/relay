@@ -10,7 +10,7 @@ type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo) 
 A description of a mutation consumable by mutationWithClientMutationId
 to create a GraphQLFieldConfig for that mutation.
 
-The inputFields and outputFields should not include `clientMutationID`,
+The inputFields and outputFields should not include `clientMutationId`,
 as this will be provided automatically.
 
 An input object will be created containing the input fields, and an
@@ -38,14 +38,14 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 	if augmentedInputFields == nil {
 		augmentedInputFields = graphql.InputObjectConfigFieldMap{}
 	}
-	augmentedInputFields["clientMutationID"] = &graphql.InputObjectFieldConfig{
+	augmentedInputFields["clientMutationId"] = &graphql.InputObjectFieldConfig{
 		Type: graphql.NewNonNull(graphql.String),
 	}
 	augmentedOutputFields := config.OutputFields
 	if augmentedOutputFields == nil {
 		augmentedOutputFields = graphql.FieldConfigMap{}
 	}
-	augmentedOutputFields["clientMutationID"] = &graphql.FieldConfig{
+	augmentedOutputFields["clientMutationId"] = &graphql.FieldConfig{
 		Type: graphql.NewNonNull(graphql.String),
 	}
 
@@ -75,8 +75,8 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 				}
 			}
 			payload := config.MutateAndGetPayload(input, p.Info)
-			if clientMutationID, ok := input["clientMutationID"]; ok {
-				payload["clientMutationID"] = clientMutationID
+			if clientMutationID, ok := input["clientMutationId"]; ok {
+				payload["clientMutationId"] = clientMutationID
 			}
 			return payload
 		},

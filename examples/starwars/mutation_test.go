@@ -19,7 +19,7 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
           faction {
             name
           }
-          clientMutationID
+          clientMutationId
         }
       }
     `
@@ -27,7 +27,7 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
 		"input": map[string]interface{}{
 			"shipName":         "B-Wing",
 			"factionId":        "1",
-			"clientMutationID": "abcde",
+			"clientMutationId": "abcde",
 		},
 	}
 	expected := &graphql.Result{
@@ -40,7 +40,7 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
 				"faction": map[string]interface{}{
 					"name": "Alliance to Restore the Republic",
 				},
-				"clientMutationID": "abcde",
+				"clientMutationId": "abcde",
 			},
 		},
 	}

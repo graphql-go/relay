@@ -90,9 +90,9 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *te
 func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMutationId(t *testing.T) {
 	query := `
         mutation M {
-          simpleMutation(input: {clientMutationID: "abc"}) {
+          simpleMutation(input: {clientMutationId: "abc"}) {
             result
-            clientMutationID
+            clientMutationId
           }
         }
       `
@@ -100,7 +100,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMuta
 		Data: map[string]interface{}{
 			"simpleMutation": map[string]interface{}{
 				"result":           1,
-				"clientMutationID": "abc",
+				"clientMutationId": "abc",
 			},
 		},
 	}
@@ -117,9 +117,9 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMuta
 func TestMutation_WithClientMutationId_BehavesCorrectly_SupportsPromiseMutations(t *testing.T) {
 	query := `
         mutation M {
-          simplePromiseMutation(input: {clientMutationID: "abc"}) {
+          simplePromiseMutation(input: {clientMutationId: "abc"}) {
             result
-            clientMutationID
+            clientMutationId
           }
         }
       `
@@ -127,7 +127,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_SupportsPromiseMutations
 		Data: map[string]interface{}{
 			"simplePromiseMutation": map[string]interface{}{
 				"result":           1,
-				"clientMutationID": "abc",
+				"clientMutationId": "abc",
 			},
 		},
 	}
@@ -164,7 +164,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
 				"kind": "INPUT_OBJECT",
 				"inputFields": []interface{}{
 					map[string]interface{}{
-						"name": "clientMutationID",
+						"name": "clientMutationId",
 						"type": map[string]interface{}{
 							"name": nil,
 							"kind": "NON_NULL",
@@ -219,7 +219,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 						},
 					},
 					map[string]interface{}{
-						"name": "clientMutationID",
+						"name": "clientMutationId",
 						"type": map[string]interface{}{
 							"name": nil,
 							"kind": "NON_NULL",

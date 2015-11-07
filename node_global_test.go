@@ -30,14 +30,14 @@ var globalIDTestPhotoType *graphql.Object
 
 var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 	IDFetcher: func(globalID string, info graphql.ResolveInfo) interface{} {
-		resolvedGlobalId := relay.FromGlobalID(globalID)
-		if resolvedGlobalId == nil {
+		resolvedGlobalID := relay.FromGlobalID(globalID)
+		if resolvedGlobalID == nil {
 			return nil
 		}
-		if resolvedGlobalId.Type == "User" {
-			return globalIDTestUserData[resolvedGlobalId.ID]
+		if resolvedGlobalID.Type == "User" {
+			return globalIDTestUserData[resolvedGlobalID.ID]
 		} else {
-			return globalIDTestPhotoData[resolvedGlobalId.ID]
+			return globalIDTestPhotoData[resolvedGlobalID.ID]
 		}
 	},
 	TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
