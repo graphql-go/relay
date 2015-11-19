@@ -198,6 +198,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 }
 func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified(t *testing.T) {
 
+	t.Skipf("Pending `validator` implementation")
 	query := `{
       usernames(usernamesMisspelled:["dschafer", "leebyron", "schrockn"]) {
         username
