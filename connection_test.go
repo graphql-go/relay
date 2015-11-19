@@ -23,30 +23,30 @@ var connectionTestConnectionDef *relay.GraphQLConnectionDefinitions
 func init() {
 	connectionTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
-		Fields: graphql.FieldConfigMap{
-			"name": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"name": &graphql.Field{
 				Type: graphql.String,
 			},
 			// re-define `friends` field later because `connectionTestUserType` has `connectionTestConnectionDef` has `connectionTestUserType` (cyclic-reference)
-			"friends": &graphql.FieldConfig{},
+			"friends": &graphql.Field{},
 		},
 	})
 
 	connectionTestConnectionDef = relay.ConnectionDefinitions(relay.ConnectionConfig{
 		Name:     "Friend",
 		NodeType: connectionTestUserType,
-		EdgeFields: graphql.FieldConfigMap{
-			"friendshipTime": &graphql.FieldConfig{
+		EdgeFields: graphql.Fields{
+			"friendshipTime": &graphql.Field{
 				Type: graphql.String,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) interface{} {
 					return "Yesterday"
 				},
 			},
 		},
-		ConnectionFields: graphql.FieldConfigMap{
-			"totalCount": &graphql.FieldConfig{
+		ConnectionFields: graphql.Fields{
+			"totalCount": &graphql.Field{
 				Type: graphql.Int,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) interface{} {
 					return len(connectionTestAllUsers)
 				},
 			},
@@ -54,10 +54,10 @@ func init() {
 	})
 
 	// define `friends` field here after getting connection definition
-	connectionTestUserType.AddFieldConfig("friends", &graphql.FieldConfig{
+	connectionTestUserType.AddFieldConfig("friends", &graphql.Field{
 		Type: connectionTestConnectionDef.ConnectionType,
 		Args: relay.ConnectionArgs,
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) interface{} {
 			arg := relay.NewConnectionArguments(p.Args)
 			res := relay.ConnectionFromArray(connectionTestAllUsers, arg)
 			return res
@@ -66,10 +66,10 @@ func init() {
 
 	connectionTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: graphql.FieldConfigMap{
-			"user": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"user": &graphql.Field{
 				Type: connectionTestUserType,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) interface{} {
 					return connectionTestAllUsers[0]
 				},
 			},
@@ -124,7 +124,7 @@ func TestConnectionDefinition_IncludesConnectionAndEdgeFields(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        connectionTestSchema,
 		RequestString: query,
 	})

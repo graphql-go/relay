@@ -19,8 +19,8 @@ func testAsyncDataMutation(resultChan *chan int) {
 var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
 	Name:        "SimpleMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
-	OutputFields: graphql.FieldConfigMap{
-		"result": &graphql.FieldConfig{
+	OutputFields: graphql.Fields{
+		"result": &graphql.Field{
 			Type: graphql.Int,
 		},
 	},
@@ -35,8 +35,8 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig{
 	Name:        "SimplePromiseMutation",
 	InputFields: graphql.InputObjectConfigFieldMap{},
-	OutputFields: graphql.FieldConfigMap{
-		"result": &graphql.FieldConfig{
+	OutputFields: graphql.Fields{
+		"result": &graphql.Field{
 			Type: graphql.Int,
 		},
 	},
@@ -52,7 +52,7 @@ var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.Mutatio
 
 var mutationTestType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Mutation",
-	Fields: graphql.FieldConfigMap{
+	Fields: graphql.Fields{
 		"simpleMutation":        simpleMutationTest,
 		"simplePromiseMutation": simplePromiseMutationTest,
 	},
@@ -79,7 +79,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *te
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -104,7 +104,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_ReturnsTheSameClientMuta
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -131,7 +131,7 @@ func TestMutation_WithClientMutationId_BehavesCorrectly_SupportsPromiseMutations
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -178,7 +178,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectInput(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -233,7 +233,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectPayload(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})
@@ -316,7 +316,7 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        mutationTestSchema,
 		RequestString: query,
 	})

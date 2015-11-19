@@ -25,7 +25,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheR
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -52,7 +52,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheRebels(t *testin
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -77,7 +77,7 @@ func TestObjectIdentification_TestFetching_CorrectlyFetchesTheIDAndTheNameOfTheE
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -104,7 +104,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheEmpire(t *testin
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})
@@ -131,7 +131,7 @@ func TestObjectIdentification_TestFetching_CorrectlyRefetchesTheXWing(t *testing
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        starwars.Schema,
 		RequestString: query,
 	})

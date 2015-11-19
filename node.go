@@ -10,7 +10,7 @@ import (
 
 type NodeDefinitions struct {
 	NodeInterface *graphql.Interface
-	NodeField     *graphql.FieldConfig
+	NodeField     *graphql.Field
 }
 
 type NodeDefinitionsConfig struct {
@@ -34,8 +34,8 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 	nodeInterface := graphql.NewInterface(graphql.InterfaceConfig{
 		Name:        "Node",
 		Description: "An object with an ID",
-		Fields: graphql.FieldConfigMap{
-			"id": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
 				Type:        graphql.NewNonNull(graphql.ID),
 				Description: "The id of the object",
 			},
@@ -43,7 +43,7 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 		ResolveType: config.TypeResolve,
 	})
 
-	nodeField := &graphql.FieldConfig{
+	nodeField := &graphql.Field{
 		Name:        "Node",
 		Description: "Fetches an object given its ID",
 		Type:        nodeInterface,
@@ -53,7 +53,7 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 				Description: "The ID of an object",
 			},
 		},
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) interface{} {
 			if config.IDFetcher == nil {
 				return nil
 			}
@@ -112,12 +112,12 @@ construct the ID from the provided typename. The type-specific ID is fetcher
 by calling idFetcher on the object, or if not provided, by accessing the `id`
 property on the object.
 */
-func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.FieldConfig {
-	return &graphql.FieldConfig{
+func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field {
+	return &graphql.Field{
 		Name:        "id",
 		Description: "The ID of an object",
 		Type:        graphql.NewNonNull(graphql.ID),
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) interface{} {
 			id := ""
 			if idFetcher != nil {
 				fetched := idFetcher(p.Source, p.Info)

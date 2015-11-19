@@ -53,11 +53,11 @@ var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 })
 var globalIDTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
-	Fields: graphql.FieldConfigMap{
+	Fields: graphql.Fields{
 		"node": globalIDTestDef.NodeField,
-		"allObjects": &graphql.FieldConfig{
+		"allObjects": &graphql.Field{
 			Type: graphql.NewList(globalIDTestDef.NodeInterface),
-			Resolve: func(p graphql.GQLFRParams) interface{} {
+			Resolve: func(p graphql.ResolveParams) interface{} {
 				return []interface{}{
 					globalIDTestUserData["1"],
 					globalIDTestUserData["2"],
@@ -75,9 +75,9 @@ var globalIDTestSchema graphql.Schema
 func init() {
 	globalIDTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
-		Fields: graphql.FieldConfigMap{
+		Fields: graphql.Fields{
 			"id": relay.GlobalIDField("User", nil),
-			"name": &graphql.FieldConfig{
+			"name": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
@@ -92,9 +92,9 @@ func init() {
 	}
 	globalIDTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
-		Fields: graphql.FieldConfigMap{
+		Fields: graphql.Fields{
 			"id": relay.GlobalIDField("Photo", photoIDFetcher),
-			"width": &graphql.FieldConfig{
+			"width": &graphql.Field{
 				Type: graphql.Int,
 			},
 		},
@@ -130,7 +130,7 @@ func TestGlobalIDFields_GivesDifferentIDs(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        globalIDTestSchema,
 		RequestString: query,
 	})
@@ -166,7 +166,7 @@ func TestGlobalIDFields_RefetchesTheIDs(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        globalIDTestSchema,
 		RequestString: query,
 	})

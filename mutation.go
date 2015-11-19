@@ -8,7 +8,7 @@ type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo) 
 
 /*
 A description of a mutation consumable by mutationWithClientMutationId
-to create a GraphQLFieldConfig for that mutation.
+to create a GraphQLField for that mutation.
 
 The inputFields and outputFields should not include `clientMutationId`,
 as this will be provided automatically.
@@ -23,16 +23,16 @@ output field. It may return synchronously, or return a Promise.
 type MutationConfig struct {
 	Name                string                            `json:"name"`
 	InputFields         graphql.InputObjectConfigFieldMap `json:"inputFields"`
-	OutputFields        graphql.FieldConfigMap            `json:"outputFields"`
+	OutputFields        graphql.Fields            `json:"outputFields"`
 	MutateAndGetPayload MutationFn                        `json:"mutateAndGetPayload"`
 }
 
 /*
-Returns a GraphQLFieldConfig for the mutation described by the
+Returns a GraphQLField for the mutation described by the
 provided MutationConfig.
 */
 
-func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
+func MutationWithClientMutationID(config MutationConfig) *graphql.Field {
 
 	augmentedInputFields := config.InputFields
 	if augmentedInputFields == nil {
@@ -43,9 +43,9 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 	}
 	augmentedOutputFields := config.OutputFields
 	if augmentedOutputFields == nil {
-		augmentedOutputFields = graphql.FieldConfigMap{}
+		augmentedOutputFields = graphql.Fields{}
 	}
-	augmentedOutputFields["clientMutationId"] = &graphql.FieldConfig{
+	augmentedOutputFields["clientMutationId"] = &graphql.Field{
 		Type: graphql.NewNonNull(graphql.String),
 	}
 
@@ -57,14 +57,14 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 		Name:   config.Name + "Payload",
 		Fields: augmentedOutputFields,
 	})
-	return &graphql.FieldConfig{
+	return &graphql.Field{
 		Type: outputType,
 		Args: graphql.FieldConfigArgument{
 			"input": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(inputType),
 			},
 		},
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) interface{} {
 			if config.MutateAndGetPayload == nil {
 				return nil
 			}

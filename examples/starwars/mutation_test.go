@@ -44,7 +44,7 @@ func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
 			},
 		},
 	}
-	result := graphql.Graphql(graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:         starwars.Schema,
 		RequestString:  query,
 		VariableValues: params,
