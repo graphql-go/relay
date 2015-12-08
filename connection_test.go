@@ -38,16 +38,16 @@ func init() {
 		EdgeFields: graphql.Fields{
 			"friendshipTime": &graphql.Field{
 				Type: graphql.String,
-				Resolve: func(p graphql.ResolveParams) interface{} {
-					return "Yesterday"
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return "Yesterday", nil
 				},
 			},
 		},
 		ConnectionFields: graphql.Fields{
 			"totalCount": &graphql.Field{
 				Type: graphql.Int,
-				Resolve: func(p graphql.ResolveParams) interface{} {
-					return len(connectionTestAllUsers)
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return len(connectionTestAllUsers), nil
 				},
 			},
 		},
@@ -57,10 +57,10 @@ func init() {
 	connectionTestUserType.AddFieldConfig("friends", &graphql.Field{
 		Type: connectionTestConnectionDef.ConnectionType,
 		Args: relay.ConnectionArgs,
-		Resolve: func(p graphql.ResolveParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			arg := relay.NewConnectionArguments(p.Args)
 			res := relay.ConnectionFromArray(connectionTestAllUsers, arg)
-			return res
+			return res, nil
 		},
 	})
 
@@ -69,8 +69,8 @@ func init() {
 		Fields: graphql.Fields{
 			"user": &graphql.Field{
 				Type: connectionTestUserType,
-				Resolve: func(p graphql.ResolveParams) interface{} {
-					return connectionTestAllUsers[0]
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return connectionTestAllUsers[0], nil
 				},
 			},
 		},

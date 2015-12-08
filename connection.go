@@ -29,10 +29,10 @@ func NewConnectionArgs(configMap graphql.FieldConfigArgument) graphql.FieldConfi
 }
 
 type ConnectionConfig struct {
-	Name             string                 `json:"name"`
-	NodeType         *graphql.Object        `json:"nodeType"`
-	EdgeFields       graphql.Fields `json:"edgeFields"`
-	ConnectionFields graphql.Fields `json:"connectionFields"`
+	Name             string          `json:"name"`
+	NodeType         *graphql.Object `json:"nodeType"`
+	EdgeFields       graphql.Fields  `json:"edgeFields"`
+	ConnectionFields graphql.Fields  `json:"connectionFields"`
 }
 
 type EdgeType struct {
