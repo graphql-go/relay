@@ -53,16 +53,16 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 				Description: "The ID of an object",
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			if config.IDFetcher == nil {
-				return nil
+				return nil, nil
 			}
 			id := ""
 			if iid, ok := p.Args["id"]; ok {
 				id = fmt.Sprintf("%v", iid)
 			}
 			fetchedID := config.IDFetcher(id, p.Info)
-			return fetchedID
+			return fetchedID, nil
 		},
 	}
 	return &NodeDefinitions{
@@ -117,7 +117,7 @@ func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field 
 		Name:        "id",
 		Description: "The ID of an object",
 		Type:        graphql.NewNonNull(graphql.ID),
-		Resolve: func(p graphql.ResolveParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			id := ""
 			if idFetcher != nil {
 				fetched := idFetcher(p.Source, p.Info)
@@ -135,7 +135,7 @@ func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field 
 				}
 			}
 			globalID := ToGlobalID(typeName, id)
-			return globalID
+			return globalID, nil
 		},
 	}
 }

@@ -191,7 +191,7 @@ func init() {
 			"ships": &graphql.Field{
 				Type: shipConnectionDefinition.ConnectionType,
 				Args: relay.ConnectionArgs,
-				Resolve: func(p graphql.ResolveParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					// convert args map[string]interface into ConnectionArguments
 					args := relay.NewConnectionArguments(p.Args)
 
@@ -205,7 +205,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return relay.ConnectionFromArray(ships, args)
+					return relay.ConnectionFromArray(ships, args), nil
 				},
 			},
 		},
@@ -230,14 +230,14 @@ func init() {
 		Fields: graphql.Fields{
 			"rebels": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.ResolveParams) interface{} {
-					return GetRebels()
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetRebels(), nil
 				},
 			},
 			"empire": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.ResolveParams) interface{} {
-					return GetEmpire()
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetEmpire(), nil
 				},
 			},
 			"node": nodeDefinitions.NodeField,
@@ -274,20 +274,20 @@ func init() {
 		OutputFields: graphql.Fields{
 			"ship": &graphql.Field{
 				Type: shipType,
-				Resolve: func(p graphql.ResolveParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						return GetShip(payload["shipId"].(string))
+						return GetShip(payload["shipId"].(string)), nil
 					}
-					return nil
+					return nil, nil
 				},
 			},
 			"faction": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.ResolveParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						return GetFaction(payload["factionId"].(string))
+						return GetFaction(payload["factionId"].(string)), nil
 					}
-					return nil
+					return nil, nil
 				},
 			},
 		},

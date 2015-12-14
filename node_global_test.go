@@ -57,13 +57,13 @@ var globalIDTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		"node": globalIDTestDef.NodeField,
 		"allObjects": &graphql.Field{
 			Type: graphql.NewList(globalIDTestDef.NodeInterface),
-			Resolve: func(p graphql.ResolveParams) interface{} {
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				return []interface{}{
 					globalIDTestUserData["1"],
 					globalIDTestUserData["2"],
 					globalIDTestPhotoData["1"],
 					globalIDTestPhotoData["2"],
-				}
+				}, nil
 			},
 		},
 	},

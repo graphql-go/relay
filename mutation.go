@@ -23,7 +23,7 @@ output field. It may return synchronously, or return a Promise.
 type MutationConfig struct {
 	Name                string                            `json:"name"`
 	InputFields         graphql.InputObjectConfigFieldMap `json:"inputFields"`
-	OutputFields        graphql.Fields            `json:"outputFields"`
+	OutputFields        graphql.Fields                    `json:"outputFields"`
 	MutateAndGetPayload MutationFn                        `json:"mutateAndGetPayload"`
 }
 
@@ -58,15 +58,16 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.Field {
 		Fields: augmentedOutputFields,
 	})
 	return &graphql.Field{
+		Name: config.Name,
 		Type: outputType,
 		Args: graphql.FieldConfigArgument{
 			"input": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(inputType),
 			},
 		},
-		Resolve: func(p graphql.ResolveParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			if config.MutateAndGetPayload == nil {
-				return nil
+				return nil, nil
 			}
 			input := map[string]interface{}{}
 			if inputVal, ok := p.Args["input"]; ok {
@@ -78,7 +79,7 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.Field {
 			if clientMutationID, ok := input["clientMutationId"]; ok {
 				payload["clientMutationId"] = clientMutationID
 			}
-			return payload
+			return payload, nil
 		},
 	}
 }
