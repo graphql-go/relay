@@ -26,7 +26,11 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 			Type: graphql.Int,
 		},
 	},
+<<<<<<< HEAD
 	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+=======
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) (map[string]interface{}, error) {
+>>>>>>> Fix tests adding error parameter in MutationFn
 		return map[string]interface{}{
 			"result": 1,
 		}, nil
@@ -42,7 +46,11 @@ var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.Mutatio
 			Type: graphql.Int,
 		},
 	},
+<<<<<<< HEAD
 	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+=======
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) (map[string]interface{}, error) {
+>>>>>>> Fix tests adding error parameter in MutationFn
 		c := make(chan int)
 		go testAsyncDataMutation(&c)
 		result := <-c
