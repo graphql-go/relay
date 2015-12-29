@@ -26,10 +26,10 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
 		return map[string]interface{}{
 			"result": 1,
-		}
+		}, nil
 	},
 })
 
@@ -42,13 +42,13 @@ var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.Mutatio
 			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
 		c := make(chan int)
 		go testAsyncDataMutation(&c)
 		result := <-c
 		return map[string]interface{}{
 			"result": result,
-		}
+		}, nil
 	},
 })
 

@@ -292,7 +292,7 @@ func init() {
 				},
 			},
 		},
-		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
 			// `inputMap` is a map with keys/fields as specified in `InputFields`
 			// Note, that these fields were specified as non-nullables, so we can assume that it exists.
 			shipName := inputMap["shipName"].(string)
@@ -304,7 +304,7 @@ func init() {
 			return map[string]interface{}{
 				"shipId":    newShip.ID,
 				"factionId": factionId,
-			}
+			}, nil
 		},
 	})
 
