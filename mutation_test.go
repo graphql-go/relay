@@ -1,12 +1,14 @@
 package relay_test
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/gqlerrors"
+	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay"
 	"golang.org/x/net/context"
@@ -30,6 +32,21 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 		return map[string]interface{}{
 			"result": 1,
 		}, nil
+	},
+})
+
+var NotFoundError = errors.New("not found")
+
+var simpleMutationErrorTest = relay.MutationWithClientMutationID(relay.MutationConfig{
+	Name:        "SimpleMutation",
+	InputFields: graphql.InputObjectConfigFieldMap{},
+	OutputFields: graphql.Fields{
+		"result": &graphql.Field{
+			Type: graphql.Int,
+		},
+	},
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+		return map[string]interface{}(nil), NotFoundError
 	},
 })
 
@@ -60,9 +77,22 @@ var mutationTestType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var mutationTestTypeError = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Mutation",
+	Fields: graphql.Fields{
+		"simpleMutation":        simpleMutationErrorTest,
+		"simplePromiseMutation": simplePromiseMutationTest,
+	},
+})
+
 var mutationTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Query:    mutationTestType,
 	Mutation: mutationTestType,
+})
+
+var mutationTestSchemaError, _ = graphql.NewSchema(graphql.SchemaConfig{
+	Query:    mutationTestType,
+	Mutation: mutationTestTypeError,
 })
 
 func TestMutation_WithClientMutationId_BehavesCorrectly_RequiresAnArgument(t *testing.T) {
@@ -324,5 +354,34 @@ func TestMutation_IntrospectsCorrectly_ContainsCorrectField(t *testing.T) {
 	})
 	if !testutil.ContainSubset(result.Data.(map[string]interface{}), expected.Data.(map[string]interface{})) {
 		t.Fatalf("unexpected, result does not contain subset of expected data")
+	}
+}
+
+func TestMutateAndGetPayload_AddsErrors(t *testing.T) {
+	query := `
+        mutation M {
+          simpleMutation(input: {clientMutationId: "abc"}) {
+            result
+            clientMutationId
+          }
+        }
+      `
+	expected := &graphql.Result{
+		Data: map[string]interface{}{
+			"simpleMutation": interface{}(nil),
+		},
+		Errors: []gqlerrors.FormattedError{
+			gqlerrors.FormattedError{
+				Message:   NotFoundError.Error(),
+				Locations: []location.SourceLocation{},
+			},
+		},
+	}
+	result := graphql.Do(graphql.Params{
+		Schema:        mutationTestSchemaError,
+		RequestString: query,
+	})
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}
 }
