@@ -3,6 +3,7 @@ package starwars
 import (
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/relay"
+	"golang.org/x/net/context"
 )
 
 /**
@@ -291,7 +292,7 @@ func init() {
 				},
 			},
 		},
-		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
 			// `inputMap` is a map with keys/fields as specified in `InputFields`
 			// Note, that these fields were specified as non-nullables, so we can assume that it exists.
 			shipName := inputMap["shipName"].(string)

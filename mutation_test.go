@@ -1,13 +1,15 @@
 package relay_test
 
 import (
+	"reflect"
+	"testing"
+	"time"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/gqlerrors"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay"
-	"reflect"
-	"testing"
-	"time"
+	"golang.org/x/net/context"
 )
 
 func testAsyncDataMutation(resultChan *chan int) {
@@ -24,7 +26,7 @@ var simpleMutationTest = relay.MutationWithClientMutationID(relay.MutationConfig
 			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
 		return map[string]interface{}{
 			"result": 1,
 		}
@@ -40,7 +42,7 @@ var simplePromiseMutationTest = relay.MutationWithClientMutationID(relay.Mutatio
 			Type: graphql.Int,
 		},
 	},
-	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
+	MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) map[string]interface{} {
 		c := make(chan int)
 		go testAsyncDataMutation(&c)
 		result := <-c
