@@ -1,11 +1,12 @@
 package starwars_test
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay/examples/starwars"
-	"reflect"
-	"testing"
 )
 
 func TestMutation_CorrectlyMutatesTheDataSet(t *testing.T) {
