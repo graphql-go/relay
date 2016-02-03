@@ -1,21 +1,24 @@
-package gqlrelay_test
+package relay_test
 
 import (
 	"fmt"
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
+	"github.com/graphql-go/graphql/gqlerrors"
+	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
+	"github.com/kr/pretty"
 	"reflect"
 	"testing"
 )
 
 var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
-	Fields: graphql.FieldConfigMap{
-		"username": &graphql.FieldConfig{
+	Fields: graphql.Fields{
+		"username": &graphql.Field{
 			Type: graphql.String,
 		},
-		"url": &graphql.FieldConfig{
+		"url": &graphql.Field{
 			Type: graphql.String,
 		},
 	},
@@ -23,8 +26,8 @@ var pluralTestUserType = graphql.NewObject(graphql.ObjectConfig{
 
 var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
-	Fields: graphql.FieldConfigMap{
-		"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
+	Fields: graphql.Fields{
+		"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
 			ArgName:     "usernames",
 			Description: "Map from a username to the user",
 			InputType:   graphql.String,
@@ -68,7 +71,7 @@ func TestPluralIdentifyingRootField_AllowsFetching(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -147,7 +150,7 @@ func TestPluralIdentifyingRootField_CorrectlyIntrospects(t *testing.T) {
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -160,8 +163,8 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 
 	var pluralTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: graphql.FieldConfigMap{
-			"usernames": gqlrelay.PluralIdentifyingRootField(gqlrelay.PluralIdentifyingRootFieldConfig{
+		Fields: graphql.Fields{
+			"usernames": relay.PluralIdentifyingRootField(relay.PluralIdentifyingRootFieldConfig{
 				ArgName:     "usernames",
 				Description: "Map from a username to the user",
 				InputType:   graphql.String,
@@ -185,7 +188,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 			"usernames": nil,
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
@@ -195,6 +198,7 @@ func TestPluralIdentifyingRootField_Configuration_ResolveSingleInputIsNil(t *tes
 }
 func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified(t *testing.T) {
 
+	t.Skipf("Pending `validator` implementation")
 	query := `{
       usernames(usernamesMisspelled:["dschafer", "leebyron", "schrockn"]) {
         username
@@ -202,14 +206,27 @@ func TestPluralIdentifyingRootField_Configuration_ArgNames_WrongArgNameSpecified
       }
     }`
 	expected := &graphql.Result{
-		Data: map[string]interface{}{
-			"usernames": nil,
+		Data: nil,
+		Errors: []gqlerrors.FormattedError{
+			gqlerrors.FormattedError{
+				Message: `Unknown argument "usernamesMisspelled" on field "usernames" of type "Query".`,
+				Locations: []location.SourceLocation{
+					location.SourceLocation{Line: 2, Column: 17},
+				},
+			},
+			gqlerrors.FormattedError{
+				Message: `Field "usernames" argument "usernames" of type "[String!]!" is required but not provided.`,
+				Locations: []location.SourceLocation{
+					location.SourceLocation{Line: 2, Column: 7},
+				},
+			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        pluralTestSchema,
 		RequestString: query,
 	})
+	pretty.Println(result)
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}

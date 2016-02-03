@@ -2,7 +2,8 @@ package starwars
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
+	"github.com/graphql-go/relay"
+	"golang.org/x/net/context"
 )
 
 /**
@@ -86,7 +87,7 @@ import (
 // - shipType refers to
 // - nodeDefinitions
 
-var nodeDefinitions *gqlrelay.NodeDefinitions
+var nodeDefinitions *relay.NodeDefinitions
 var shipType *graphql.Object
 var factionType *graphql.Object
 
@@ -101,16 +102,16 @@ func init() {
 	 * The first method is the way we resolve an ID to its object. The second is the
 	 * way we resolve an object that implements node to its type.
 	 */
-	nodeDefinitions = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
+	nodeDefinitions = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 		IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
 			// resolve id from global id
-			resolvedId := gqlrelay.FromGlobalID(id)
+			resolvedID := relay.FromGlobalID(id)
 
 			// based on id and its type, return the object
-			if resolvedId.Type == "Faction" {
-				return GetFaction(resolvedId.ID)
+			if resolvedID.Type == "Faction" {
+				return GetFaction(resolvedID.ID)
 			} else {
-				return GetShip(resolvedId.ID)
+				return GetShip(resolvedID.ID)
 			}
 		},
 		TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
@@ -136,9 +137,9 @@ func init() {
 	shipType = graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Ship",
 		Description: "A ship in the Star Wars saga",
-		Fields: graphql.FieldConfigMap{
-			"id": gqlrelay.GlobalIDField("Ship", nil),
-			"name": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"id": relay.GlobalIDField("Ship", nil),
+			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the ship.",
 			},
@@ -164,7 +165,7 @@ func init() {
 	 *     node: Ship
 	 *   }
 	 */
-	shipConnectionDefinition := gqlrelay.ConnectionDefinitions(gqlrelay.ConnectionConfig{
+	shipConnectionDefinition := relay.ConnectionDefinitions(relay.ConnectionConfig{
 		Name:     "Ship",
 		NodeType: shipType,
 	})
@@ -182,18 +183,18 @@ func init() {
 	factionType = graphql.NewObject(graphql.ObjectConfig{
 		Name:        "Faction",
 		Description: "A faction in the Star Wars saga",
-		Fields: graphql.FieldConfigMap{
-			"id": gqlrelay.GlobalIDField("Faction", nil),
-			"name": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"id": relay.GlobalIDField("Faction", nil),
+			"name": &graphql.Field{
 				Type:        graphql.String,
 				Description: "The name of the faction.",
 			},
-			"ships": &graphql.FieldConfig{
+			"ships": &graphql.Field{
 				Type: shipConnectionDefinition.ConnectionType,
-				Args: gqlrelay.ConnectionArgs,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Args: relay.ConnectionArgs,
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					// convert args map[string]interface into ConnectionArguments
-					args := gqlrelay.NewConnectionArguments(p.Args)
+					args := relay.NewConnectionArguments(p.Args)
 
 					// get ship objects from current faction
 					ships := []interface{}{}
@@ -205,7 +206,7 @@ func init() {
 					// let relay library figure out the result, given
 					// - the list of ships for this faction
 					// - and the filter arguments (i.e. first, last, after, before)
-					return gqlrelay.ConnectionFromArray(ships, args)
+					return relay.ConnectionFromArray(ships, args), nil
 				},
 			},
 		},
@@ -227,17 +228,17 @@ func init() {
 	 */
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: graphql.FieldConfigMap{
-			"rebels": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"rebels": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
-					return GetRebels()
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetRebels(), nil
 				},
 			},
-			"empire": &graphql.FieldConfig{
+			"empire": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
-					return GetEmpire()
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetEmpire(), nil
 				},
 			},
 			"node": nodeDefinitions.NodeField,
@@ -245,7 +246,7 @@ func init() {
 	})
 
 	/**
-	 * This will return a GraphQLFieldConfig for our ship
+	 * This will return a GraphQLField for our ship
 	 * mutation.
 	 *
 	 * It creates these two types implicitly:
@@ -261,7 +262,7 @@ func init() {
 	 *     faction: Faction
 	 *   }
 	 */
-	shipMutation := gqlrelay.MutationWithClientMutationID(gqlrelay.MutationConfig{
+	shipMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
 		Name: "IntroduceShip",
 		InputFields: graphql.InputObjectConfigFieldMap{
 			"shipName": &graphql.InputObjectFieldConfig{
@@ -271,27 +272,27 @@ func init() {
 				Type: graphql.NewNonNull(graphql.ID),
 			},
 		},
-		OutputFields: graphql.FieldConfigMap{
-			"ship": &graphql.FieldConfig{
+		OutputFields: graphql.Fields{
+			"ship": &graphql.Field{
 				Type: shipType,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						return GetShip(payload["shipId"].(string))
+						return GetShip(payload["shipId"].(string)), nil
 					}
-					return nil
+					return nil, nil
 				},
 			},
-			"faction": &graphql.FieldConfig{
+			"faction": &graphql.Field{
 				Type: factionType,
-				Resolve: func(p graphql.GQLFRParams) interface{} {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						return GetFaction(payload["factionId"].(string))
+						return GetFaction(payload["factionId"].(string)), nil
 					}
-					return nil
+					return nil, nil
 				},
 			},
 		},
-		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{} {
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
 			// `inputMap` is a map with keys/fields as specified in `InputFields`
 			// Note, that these fields were specified as non-nullables, so we can assume that it exists.
 			shipName := inputMap["shipName"].(string)
@@ -303,7 +304,7 @@ func init() {
 			return map[string]interface{}{
 				"shipId":    newShip.ID,
 				"factionId": factionId,
-			}
+			}, nil
 		},
 	})
 
@@ -319,7 +320,7 @@ func init() {
 
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
-		Fields: graphql.FieldConfigMap{
+		Fields: graphql.Fields{
 			"introduceShip": shipMutation,
 		},
 	})

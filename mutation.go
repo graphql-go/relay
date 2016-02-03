@@ -1,16 +1,17 @@
-package gqlrelay
+package relay
 
 import (
 	"github.com/graphql-go/graphql"
+	"golang.org/x/net/context"
 )
 
-type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo) map[string]interface{}
+type MutationFn func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error)
 
 /*
 A description of a mutation consumable by mutationWithClientMutationId
-to create a GraphQLFieldConfig for that mutation.
+to create a GraphQLField for that mutation.
 
-The inputFields and outputFields should not include `clientMutationID`,
+The inputFields and outputFields should not include `clientMutationId`,
 as this will be provided automatically.
 
 An input object will be created containing the input fields, and an
@@ -23,29 +24,29 @@ output field. It may return synchronously, or return a Promise.
 type MutationConfig struct {
 	Name                string                            `json:"name"`
 	InputFields         graphql.InputObjectConfigFieldMap `json:"inputFields"`
-	OutputFields        graphql.FieldConfigMap            `json:"outputFields"`
+	OutputFields        graphql.Fields                    `json:"outputFields"`
 	MutateAndGetPayload MutationFn                        `json:"mutateAndGetPayload"`
 }
 
 /*
-Returns a GraphQLFieldConfig for the mutation described by the
+Returns a GraphQLField for the mutation described by the
 provided MutationConfig.
 */
 
-func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
+func MutationWithClientMutationID(config MutationConfig) *graphql.Field {
 
 	augmentedInputFields := config.InputFields
 	if augmentedInputFields == nil {
 		augmentedInputFields = graphql.InputObjectConfigFieldMap{}
 	}
-	augmentedInputFields["clientMutationID"] = &graphql.InputObjectFieldConfig{
+	augmentedInputFields["clientMutationId"] = &graphql.InputObjectFieldConfig{
 		Type: graphql.NewNonNull(graphql.String),
 	}
 	augmentedOutputFields := config.OutputFields
 	if augmentedOutputFields == nil {
-		augmentedOutputFields = graphql.FieldConfigMap{}
+		augmentedOutputFields = graphql.Fields{}
 	}
-	augmentedOutputFields["clientMutationID"] = &graphql.FieldConfig{
+	augmentedOutputFields["clientMutationId"] = &graphql.Field{
 		Type: graphql.NewNonNull(graphql.String),
 	}
 
@@ -57,16 +58,17 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 		Name:   config.Name + "Payload",
 		Fields: augmentedOutputFields,
 	})
-	return &graphql.FieldConfig{
+	return &graphql.Field{
+		Name: config.Name,
 		Type: outputType,
 		Args: graphql.FieldConfigArgument{
 			"input": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(inputType),
 			},
 		},
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			if config.MutateAndGetPayload == nil {
-				return nil
+				return nil, nil
 			}
 			input := map[string]interface{}{}
 			if inputVal, ok := p.Args["input"]; ok {
@@ -74,11 +76,14 @@ func MutationWithClientMutationID(config MutationConfig) *graphql.FieldConfig {
 					input = inputVal
 				}
 			}
-			payload := config.MutateAndGetPayload(input, p.Info)
-			if clientMutationID, ok := input["clientMutationID"]; ok {
-				payload["clientMutationID"] = clientMutationID
+			payload, err := config.MutateAndGetPayload(input, p.Info, p.Context)
+			if err != nil {
+				return nil, err
 			}
-			return payload
+			if clientMutationID, ok := input["clientMutationId"]; ok {
+				payload["clientMutationId"] = clientMutationID
+			}
+			return payload, nil
 		},
 	}
 }

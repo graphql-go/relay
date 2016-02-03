@@ -1,4 +1,4 @@
-package gqlrelay
+package relay
 
 import (
 	"github.com/graphql-go/graphql"
@@ -13,7 +13,7 @@ type PluralIdentifyingRootFieldConfig struct {
 	Description        string               `json:"description"`
 }
 
-func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphql.FieldConfig {
+func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphql.Field {
 	inputArgs := graphql.FieldConfigArgument{}
 	if config.ArgName != "" {
 		inputArgs[config.ArgName] = &graphql.ArgumentConfig{
@@ -21,18 +21,18 @@ func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphq
 		}
 	}
 
-	return &graphql.FieldConfig{
+	return &graphql.Field{
 		Description: config.Description,
 		Type:        graphql.NewList(config.OutputType),
 		Args:        inputArgs,
-		Resolve: func(p graphql.GQLFRParams) interface{} {
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			inputs, ok := p.Args[config.ArgName]
 			if !ok {
-				return nil
+				return nil, nil
 			}
 
 			if config.ResolveSingleInput == nil {
-				return nil
+				return nil, nil
 			}
 			switch inputs := inputs.(type) {
 			case []interface{}:
@@ -41,9 +41,9 @@ func PluralIdentifyingRootField(config PluralIdentifyingRootFieldConfig) *graphq
 					r := config.ResolveSingleInput(input)
 					res = append(res, r)
 				}
-				return res
+				return res, nil
 			}
-			return nil
+			return nil, nil
 		},
 	}
 }

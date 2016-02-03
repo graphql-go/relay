@@ -1,10 +1,10 @@
-package gqlrelay_test
+package relay_test
 
 import (
 	"fmt"
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/graphql-relay-go"
 	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
 )
@@ -32,7 +32,7 @@ var nodeTestPhotoData = map[string]*photo{
 var nodeTestUserType *graphql.Object
 var nodeTestPhotoType *graphql.Object
 
-var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
+var nodeTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 	IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
 		if user, ok := nodeTestUserData[id]; ok {
 			return user
@@ -55,7 +55,7 @@ var nodeTestDef = gqlrelay.NewNodeDefinitions(gqlrelay.NodeDefinitionsConfig{
 })
 var nodeTestQueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
-	Fields: graphql.FieldConfigMap{
+	Fields: graphql.Fields{
 		"node": nodeTestDef.NodeField,
 	},
 })
@@ -66,11 +66,11 @@ var nodeTestSchema graphql.Schema
 func init() {
 	nodeTestUserType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "User",
-		Fields: graphql.FieldConfigMap{
-			"id": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.ID),
 			},
-			"name": &graphql.FieldConfig{
+			"name": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
@@ -78,11 +78,11 @@ func init() {
 	})
 	nodeTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",
-		Fields: graphql.FieldConfigMap{
-			"id": &graphql.FieldConfig{
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.ID),
 			},
-			"width": &graphql.FieldConfig{
+			"width": &graphql.Field{
 				Type: graphql.Int,
 			},
 		},
@@ -92,13 +92,6 @@ func init() {
 	nodeTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 		Query: nodeTestQueryType,
 	})
-}
-
-func testGraphql(t *testing.T, p graphql.Params) *graphql.Result {
-	resultChannel := make(chan *graphql.Result)
-	go graphql.Graphql(p, resultChannel)
-	result := <-resultChannel
-	return result
 }
 func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *testing.T) {
 	query := `{
@@ -113,7 +106,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForUsers(t *tes
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -134,7 +127,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectIDForPhotos(t *te
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -159,7 +152,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectNameForUsers(t *t
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -184,7 +177,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectWidthForPhotos(t 
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -207,7 +200,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForUsers(
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -230,7 +223,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_GetsTheCorrectTypeNameForPhotos
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -254,7 +247,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_IgnoresPhotoFragmentsOnUser(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -273,7 +266,7 @@ func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing
 			"node": nil,
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -318,7 +311,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeInterface(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
@@ -379,7 +372,7 @@ func TestNodeInterfaceAndFields_CorrectlyIntrospects_HasCorrectNodeRootField(t *
 			},
 		},
 	}
-	result := testGraphql(t, graphql.Params{
+	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
