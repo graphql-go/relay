@@ -103,7 +103,7 @@ func init() {
 	 * way we resolve an object that implements node to its type.
 	 */
 	nodeDefinitions = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
-		IDFetcher: func(id string, info graphql.ResolveInfo) interface{} {
+		IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) interface{} {
 			// resolve id from global id
 			resolvedID := relay.FromGlobalID(id)
 

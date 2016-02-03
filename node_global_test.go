@@ -5,6 +5,7 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay"
+	"golang.org/x/net/context"
 	"reflect"
 	"testing"
 )
@@ -29,7 +30,7 @@ var globalIDTestUserType *graphql.Object
 var globalIDTestPhotoType *graphql.Object
 
 var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
-	IDFetcher: func(globalID string, info graphql.ResolveInfo) interface{} {
+	IDFetcher: func(globalID string, info graphql.ResolveInfo, ctx context.Context) interface{} {
 		resolvedGlobalID := relay.FromGlobalID(globalID)
 		if resolvedGlobalID == nil {
 			return nil
@@ -83,7 +84,7 @@ func init() {
 		},
 		Interfaces: []*graphql.Interface{globalIDTestDef.NodeInterface},
 	})
-	photoIDFetcher := func(obj interface{}, info graphql.ResolveInfo) string {
+	photoIDFetcher := func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) string {
 		switch obj := obj.(type) {
 		case *photo2:
 			return fmt.Sprintf("%v", obj.PhotoId)
