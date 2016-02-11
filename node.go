@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"golang.org/x/net/context"
 	"strings"
 )
 
@@ -17,8 +18,8 @@ type NodeDefinitionsConfig struct {
 	IDFetcher   IDFetcherFn
 	TypeResolve graphql.ResolveTypeFn
 }
-type IDFetcherFn func(id string, info graphql.ResolveInfo) interface{}
-type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo) string
+type IDFetcherFn func(id string, info graphql.ResolveInfo, ctx context.Context) interface{}
+type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) string
 
 /*
  Given a function to map from an ID to an underlying object, and a function
@@ -61,7 +62,7 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 			if iid, ok := p.Args["id"]; ok {
 				id = fmt.Sprintf("%v", iid)
 			}
-			fetchedID := config.IDFetcher(id, p.Info)
+			fetchedID := config.IDFetcher(id, p.Info, p.Context)
 			return fetchedID, nil
 		},
 	}
@@ -120,7 +121,7 @@ func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			id := ""
 			if idFetcher != nil {
-				fetched := idFetcher(p.Source, p.Info)
+				fetched := idFetcher(p.Source, p.Info, p.Context)
 				id = fmt.Sprintf("%v", fetched)
 			} else {
 				// try to get from p.Source (data)
