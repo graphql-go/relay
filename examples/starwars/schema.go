@@ -1,6 +1,7 @@
 package starwars
 
 import (
+	"errors"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/relay"
 	"golang.org/x/net/context"
@@ -103,15 +104,18 @@ func init() {
 	 * way we resolve an object that implements node to its type.
 	 */
 	nodeDefinitions = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
-		IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) interface{} {
+		IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 			// resolve id from global id
 			resolvedID := relay.FromGlobalID(id)
 
 			// based on id and its type, return the object
-			if resolvedID.Type == "Faction" {
-				return GetFaction(resolvedID.ID)
-			} else {
-				return GetShip(resolvedID.ID)
+			switch resolvedID.Type {
+			case "Faction":
+				return GetFaction(resolvedID.ID), nil
+			case "Ship":
+				return GetShip(resolvedID.ID), nil
+			default:
+				return nil, errors.New("Unknown node type")
 			}
 		},
 		TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {

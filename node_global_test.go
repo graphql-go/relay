@@ -1,6 +1,7 @@
 package relay_test
 
 import (
+	"errors"
 	"fmt"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
@@ -30,15 +31,19 @@ var globalIDTestUserType *graphql.Object
 var globalIDTestPhotoType *graphql.Object
 
 var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
-	IDFetcher: func(globalID string, info graphql.ResolveInfo, ctx context.Context) interface{} {
+	IDFetcher: func(globalID string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 		resolvedGlobalID := relay.FromGlobalID(globalID)
 		if resolvedGlobalID == nil {
-			return nil
+			return nil, errors.New("Unknown node id")
 		}
-		if resolvedGlobalID.Type == "User" {
-			return globalIDTestUserData[resolvedGlobalID.ID]
-		} else {
-			return globalIDTestPhotoData[resolvedGlobalID.ID]
+
+		switch resolvedGlobalID.Type {
+		case "User":
+			return globalIDTestUserData[resolvedGlobalID.ID], nil
+		case "Photo":
+			return globalIDTestPhotoData[resolvedGlobalID.ID], nil
+		default:
+			return nil, errors.New("Unknown node type")
 		}
 	},
 	TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
@@ -84,12 +89,12 @@ func init() {
 		},
 		Interfaces: []*graphql.Interface{globalIDTestDef.NodeInterface},
 	})
-	photoIDFetcher := func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) string {
+	photoIDFetcher := func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) (string, error) {
 		switch obj := obj.(type) {
 		case *photo2:
-			return fmt.Sprintf("%v", obj.PhotoId)
+			return fmt.Sprintf("%v", obj.PhotoId), nil
 		}
-		return ""
+		return "", errors.New("Not a photo")
 	}
 	globalIDTestPhotoType = graphql.NewObject(graphql.ObjectConfig{
 		Name: "Photo",

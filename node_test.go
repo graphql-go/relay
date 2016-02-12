@@ -1,8 +1,11 @@
 package relay_test
 
 import (
+	"errors"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/graphql/gqlerrors"
+	"github.com/graphql-go/graphql/language/location"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay"
 	"golang.org/x/net/context"
@@ -34,14 +37,14 @@ var nodeTestUserType *graphql.Object
 var nodeTestPhotoType *graphql.Object
 
 var nodeTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
-	IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) interface{} {
+	IDFetcher: func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error) {
 		if user, ok := nodeTestUserData[id]; ok {
-			return user
+			return user, nil
 		}
 		if photo, ok := nodeTestPhotoData[id]; ok {
-			return photo
+			return photo, nil
 		}
-		return nil
+		return nil, errors.New("Unknown node")
 	},
 	TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
 		switch value.(type) {
@@ -266,11 +269,18 @@ func TestNodeInterfaceAndFields_AllowsRefetching_ReturnsNullForBadIDs(t *testing
 		Data: map[string]interface{}{
 			"node": nil,
 		},
+		Errors: []gqlerrors.FormattedError{
+			{
+				Message:   "Unknown node",
+				Locations: []location.SourceLocation{},
+			},
+		},
 	}
 	result := graphql.Do(graphql.Params{
 		Schema:        nodeTestSchema,
 		RequestString: query,
 	})
+
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatalf("wrong result, graphql result diff: %v", testutil.Diff(expected, result))
 	}

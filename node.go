@@ -18,8 +18,8 @@ type NodeDefinitionsConfig struct {
 	IDFetcher   IDFetcherFn
 	TypeResolve graphql.ResolveTypeFn
 }
-type IDFetcherFn func(id string, info graphql.ResolveInfo, ctx context.Context) interface{}
-type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) string
+type IDFetcherFn func(id string, info graphql.ResolveInfo, ctx context.Context) (interface{}, error)
+type GlobalIDFetcherFn func(obj interface{}, info graphql.ResolveInfo, ctx context.Context) (string, error)
 
 /*
  Given a function to map from an ID to an underlying object, and a function
@@ -62,8 +62,7 @@ func NewNodeDefinitions(config NodeDefinitionsConfig) *NodeDefinitions {
 			if iid, ok := p.Args["id"]; ok {
 				id = fmt.Sprintf("%v", iid)
 			}
-			fetchedID := config.IDFetcher(id, p.Info, p.Context)
-			return fetchedID, nil
+			return config.IDFetcher(id, p.Info, p.Context)
 		},
 	}
 	return &NodeDefinitions{
@@ -121,8 +120,11 @@ func GlobalIDField(typeName string, idFetcher GlobalIDFetcherFn) *graphql.Field 
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			id := ""
 			if idFetcher != nil {
-				fetched := idFetcher(p.Source, p.Info, p.Context)
+				fetched, err := idFetcher(p.Source, p.Info, p.Context)
 				id = fmt.Sprintf("%v", fetched)
+				if err != nil {
+					return id, err
+				}
 			} else {
 				// try to get from p.Source (data)
 				var objMap interface{}
