@@ -11,7 +11,8 @@ import (
 const PREFIX = "arrayconnection:"
 
 type ArraySliceMetaInfo struct {
-	SliceStart, ArrayLength int
+	SliceStart  int `json:"sliceStart"`
+	ArrayLength int `json:"arrayLength"`
 }
 
 /*
@@ -45,8 +46,8 @@ func ConnectionFromArraySlice(
 	meta ArraySliceMetaInfo,
 ) *Connection {
 	sliceEnd := meta.SliceStart + len(arraySlice)
-	beforeOffset := getOffsetWithDefault(args.Before, meta.ArrayLength)
-	afterOffset := getOffsetWithDefault(args.After, -1)
+	beforeOffset := GetOffsetWithDefault(args.Before, meta.ArrayLength)
+	afterOffset := GetOffsetWithDefault(args.After, -1)
 
 	startOffset := ternaryMax(meta.SliceStart-1, afterOffset, -1) + 1
 	endOffset := ternaryMin(sliceEnd, beforeOffset, meta.ArrayLength)
@@ -71,7 +72,7 @@ func ConnectionFromArraySlice(
 	edges := []*Edge{}
 	for index, value := range slice {
 		edges = append(edges, &Edge{
-			Cursor: offsetToCursor(startOffset + index),
+			Cursor: OffsetToCursor(startOffset + index),
 			Node:   value,
 		})
 	}
@@ -115,7 +116,7 @@ func ConnectionFromArraySlice(
 }
 
 // Creates the cursor string from an offset
-func offsetToCursor(offset int) ConnectionCursor {
+func OffsetToCursor(offset int) ConnectionCursor {
 	str := fmt.Sprintf("%v%v", PREFIX, offset)
 	return ConnectionCursor(base64.StdEncoding.EncodeToString([]byte(str)))
 }
@@ -148,10 +149,10 @@ func CursorForObjectInConnection(data []interface{}, object interface{}) Connect
 	if offset == -1 {
 		return ""
 	}
-	return offsetToCursor(offset)
+	return OffsetToCursor(offset)
 }
 
-func getOffsetWithDefault(cursor ConnectionCursor, defaultOffset int) int {
+func GetOffsetWithDefault(cursor ConnectionCursor, defaultOffset int) int {
 	if cursor == "" {
 		return defaultOffset
 	}
