@@ -4,92 +4,125 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 )
 
 const PREFIX = "arrayconnection:"
 
+type ArraySliceMetaInfo struct {
+	SliceStart  int `json:"sliceStart"`
+	ArrayLength int `json:"arrayLength"`
+}
+
 /*
 A simple function that accepts an array and connection arguments, and returns
 a connection object for use in GraphQL. It uses array offsets as pagination,
 so pagination will only work if the array is static.
 */
-
 func ConnectionFromArray(data []interface{}, args ConnectionArguments) *Connection {
-	edges := []*Edge{}
-	for index, value := range data {
-		edges = append(edges, &Edge{
-			Cursor: offsetToCursor(index),
-			Node:   value,
-		})
+	return ConnectionFromArraySlice(
+		data,
+		args,
+		ArraySliceMetaInfo{
+			SliceStart:  0,
+			ArrayLength: len(data),
+		},
+	)
+}
+
+/*
+Given a slice (subset) of an array, returns a connection object for use in
+GraphQL.
+
+This function is similar to `ConnectionFromArray`, but is intended for use
+cases where you know the cardinality of the connection, consider it too large
+to materialize the entire array, and instead wish pass in a slice of the
+total result large enough to cover the range specified in `args`.
+*/
+func ConnectionFromArraySlice(
+	arraySlice []interface{},
+	args ConnectionArguments,
+	meta ArraySliceMetaInfo,
+) *Connection {
+	sliceEnd := meta.SliceStart + len(arraySlice)
+	beforeOffset := GetOffsetWithDefault(args.Before, meta.ArrayLength)
+	afterOffset := GetOffsetWithDefault(args.After, -1)
+
+	startOffset := ternaryMax(meta.SliceStart-1, afterOffset, -1) + 1
+	endOffset := ternaryMin(sliceEnd, beforeOffset, meta.ArrayLength)
+
+	if args.First != -1 {
+		endOffset = min(endOffset, startOffset+args.First)
 	}
 
-	// slice with cursors
-	afterOffset := getOffset(args.After, -1)
-	beforeOffset := getOffset(args.Before, len(edges)+1)
+	if args.Last != -1 {
+		startOffset = max(startOffset, endOffset-args.Last)
+	}
 
-	begin := int(math.Max(float64(afterOffset), -1) + 1)
-	end := int(math.Min(float64(beforeOffset), float64(len(edges))))
+	begin := max(startOffset-meta.SliceStart, 0)
+	end := len(arraySlice) - (sliceEnd - endOffset)
+
 	if begin > end {
 		return NewConnection()
 	}
 
-	edges = edges[begin:end]
-	if len(edges) == 0 {
-		return NewConnection()
+	slice := arraySlice[begin:end]
+
+	edges := []*Edge{}
+	for index, value := range slice {
+		edges = append(edges, &Edge{
+			Cursor: OffsetToCursor(startOffset + index),
+			Node:   value,
+		})
 	}
 
-	// save the pre-slice cursors
-	firstPresliceCursor := edges[0].Cursor
-	lastPresliceCursor := edges[len(edges)-1:][0].Cursor
-
-	// slice with limits
-	if args.First >= 0 {
-		first := int(math.Min(float64(args.First), float64(len(edges))))
-		edges = edges[0:first]
+	var firstEdgeCursor, lastEdgeCursor ConnectionCursor
+	if len(edges) > 0 {
+		firstEdgeCursor = edges[0].Cursor
+		lastEdgeCursor = edges[len(edges)-1:][0].Cursor
 	}
 
-	if args.Last >= 0 {
-		last := int(math.Min(float64(args.Last), float64(len(edges))))
-		edges = edges[len(edges)-last:]
+	lowerBound := 0
+	if len(args.After) > 0 {
+		lowerBound = afterOffset + 1
 	}
 
-	if len(edges) == 0 {
-		return NewConnection()
+	upperBound := meta.ArrayLength
+	if len(args.Before) > 0 {
+		upperBound = beforeOffset
 	}
-	firstEdge := edges[0]
-	lastEdge := edges[len(edges)-1:][0]
+
 	hasPreviousPage := false
-	if firstEdge.Cursor != firstPresliceCursor {
-		hasPreviousPage = true
+	if args.Last != -1 {
+		hasPreviousPage = startOffset > lowerBound
 	}
+
 	hasNextPage := false
-	if lastEdge.Cursor != lastPresliceCursor {
-		hasNextPage = true
+	if args.First != -1 {
+		hasNextPage = endOffset < upperBound
 	}
 
 	conn := NewConnection()
 	conn.Edges = edges
 	conn.PageInfo = PageInfo{
-		StartCursor:     firstEdge.Cursor,
-		EndCursor:       lastEdge.Cursor,
+		StartCursor:     firstEdgeCursor,
+		EndCursor:       lastEdgeCursor,
 		HasPreviousPage: hasPreviousPage,
 		HasNextPage:     hasNextPage,
 	}
+
 	return conn
 }
 
 // Creates the cursor string from an offset
-func offsetToCursor(offset int) ConnectionCursor {
+func OffsetToCursor(offset int) ConnectionCursor {
 	str := fmt.Sprintf("%v%v", PREFIX, offset)
 	return ConnectionCursor(base64.StdEncoding.EncodeToString([]byte(str)))
 }
 
 // Re-derives the offset from the cursor string.
-func cursorToOffset(cursor ConnectionCursor) (int, error) {
-
+func CursorToOffset(cursor ConnectionCursor) (int, error) {
 	str := ""
 	b, err := base64.StdEncoding.DecodeString(string(cursor))
 	if err == nil {
@@ -116,16 +149,38 @@ func CursorForObjectInConnection(data []interface{}, object interface{}) Connect
 	if offset == -1 {
 		return ""
 	}
-	return offsetToCursor(offset)
+	return OffsetToCursor(offset)
 }
 
-func getOffset(cursor ConnectionCursor, defaultOffset int) int {
+func GetOffsetWithDefault(cursor ConnectionCursor, defaultOffset int) int {
 	if cursor == "" {
 		return defaultOffset
 	}
-	offset, err := cursorToOffset(cursor)
+	offset, err := CursorToOffset(cursor)
 	if err != nil {
 		return defaultOffset
 	}
 	return offset
+}
+
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
+}
+
+func ternaryMax(a, b, c int) int {
+	return max(max(a, b), c)
+}
+
+func min(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
+
+func ternaryMin(a, b, c int) int {
+	return min(min(a, b), c)
 }
