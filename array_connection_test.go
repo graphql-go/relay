@@ -1,10 +1,11 @@
 package relay_test
 
 import (
-	"github.com/graphql-go/graphql/testutil"
-	"github.com/graphql-go/relay"
 	"reflect"
 	"testing"
+
+	"github.com/graphql-go/graphql/testutil"
+	"github.com/graphql-go/relay"
 )
 
 var arrayConnectionTestLetters = []interface{}{
@@ -554,8 +555,11 @@ func TestConnectionFromArray_HandlesCursorEdgeCases_ReturnsNoElementsIfFirstIsZe
 	args := relay.NewConnectionArguments(filter)
 
 	expected := &relay.Connection{
-		Edges:    []*relay.Edge{},
-		PageInfo: relay.PageInfo{},
+		Edges: []*relay.Edge{},
+		PageInfo: relay.PageInfo{
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
 	}
 
 	result := relay.ConnectionFromArray(arrayConnectionTestLetters, args)
@@ -695,5 +699,266 @@ func TestConnectionFromArray_CursorForObjectInConnection_ReturnsEmptyCursor_Give
 	letterFCursor := relay.CursorForObjectInConnection(arrayConnectionTestLetters, "F")
 	if letterFCursor != "" {
 		t.Fatalf("wrong result, expected empty cursor, got: %v", letterFCursor)
+	}
+}
+
+func TestConnectionFromArraySlice_JustRightArraySlice(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 2,
+		"after": "YXJyYXljb25uZWN0aW9uOjA=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "B",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
+			},
+			&relay.Edge{
+				Node:   "C",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[1:3],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  1,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_OversizedSliceLeft(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 2,
+		"after": "YXJyYXljb25uZWN0aW9uOjA=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "B",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjE=",
+			},
+			&relay.Edge{
+				Node:   "C",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjE=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[0:3],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  0,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_OversizedSliceRight(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 1,
+		"after": "YXJyYXljb25uZWN0aW9uOjE=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "C",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[2:4],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  2,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_OversizedSliceBoth(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 1,
+		"after": "YXJyYXljb25uZWN0aW9uOjE=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "C",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjI=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[1:4],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  1,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_UndersizedSliceLeft(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 3,
+		"after": "YXJyYXljb25uZWN0aW9uOjE=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "D",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
+			},
+			&relay.Edge{
+				Node:   "E",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjQ=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjQ=",
+			HasPreviousPage: false,
+			HasNextPage:     false,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[3:5],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  3,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_UndersizedSliceRight(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 3,
+		"after": "YXJyYXljb25uZWN0aW9uOjE=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "C",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjI=",
+			},
+			&relay.Edge{
+				Node:   "D",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjI=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[2:4],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  2,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
+	}
+}
+
+func TestConnectionFromArraySlice_UndersizedSliceBoth(t *testing.T) {
+	filter := map[string]interface{}{
+		"first": 3,
+		"after": "YXJyYXljb25uZWN0aW9uOjE=",
+	}
+	args := relay.NewConnectionArguments(filter)
+
+	expected := &relay.Connection{
+		Edges: []*relay.Edge{
+			&relay.Edge{
+				Node:   "D",
+				Cursor: "YXJyYXljb25uZWN0aW9uOjM=",
+			},
+		},
+		PageInfo: relay.PageInfo{
+			StartCursor:     "YXJyYXljb25uZWN0aW9uOjM=",
+			EndCursor:       "YXJyYXljb25uZWN0aW9uOjM=",
+			HasPreviousPage: false,
+			HasNextPage:     true,
+		},
+	}
+
+	result := relay.ConnectionFromArraySlice(
+		arrayConnectionTestLetters[3:4],
+		args,
+		relay.ArraySliceMetaInfo{
+			SliceStart:  3,
+			ArrayLength: 5,
+		},
+	)
+	if !reflect.DeepEqual(result, expected) {
+		t.Fatalf("wrong result, connection result diff: %v", testutil.Diff(expected, result))
 	}
 }
