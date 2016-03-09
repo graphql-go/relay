@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -141,7 +142,7 @@ func CursorForObjectInConnection(data []interface{}, object interface{}) Connect
 	offset := -1
 	for i, d := range data {
 		// TODO: better object comparison
-		if d == object {
+		if reflect.DeepEqual(d, object) {
 			offset = i
 			break
 		}
