@@ -2,6 +2,7 @@ package starwars
 
 import (
 	"errors"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/relay"
 	"golang.org/x/net/context"
@@ -118,9 +119,9 @@ func init() {
 				return nil, errors.New("Unknown node type")
 			}
 		},
-		TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
+		TypeResolve: func(p graphql.ResolveTypeParams) *graphql.Object {
 			// based on the type of the value, return GraphQLObjectType
-			switch value.(type) {
+			switch p.Value.(type) {
 			case *Faction:
 				return factionType
 			default:
