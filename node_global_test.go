@@ -3,12 +3,13 @@ package relay_test
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"testing"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
 	"github.com/graphql-go/relay"
 	"golang.org/x/net/context"
-	"reflect"
-	"testing"
 )
 
 type photo2 struct {
@@ -46,14 +47,14 @@ var globalIDTestDef = relay.NewNodeDefinitions(relay.NodeDefinitionsConfig{
 			return nil, errors.New("Unknown node type")
 		}
 	},
-	TypeResolve: func(value interface{}, info graphql.ResolveInfo) *graphql.Object {
-		switch value.(type) {
+	TypeResolve: func(p graphql.ResolveTypeParams) *graphql.Object {
+		switch p.Value.(type) {
 		case *user:
 			return globalIDTestUserType
 		case *photo2:
 			return globalIDTestPhotoType
 		default:
-			panic(fmt.Sprintf("Unknown object type `%v`", value))
+			panic(fmt.Sprintf("Unknown object type `%v`", p.Value))
 		}
 	},
 })
@@ -109,6 +110,7 @@ func init() {
 
 	globalIDTestSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 		Query: globalIDTestQueryType,
+		Types: []graphql.Type{globalIDTestUserType, globalIDTestPhotoType},
 	})
 }
 
